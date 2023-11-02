@@ -6,7 +6,7 @@ abstract class BitrielSDKUseCase {
   Future<void> initBitrielSDK({required String jsFilePath});
 
   Future<void> fetchNetwork();
-  void setNetworkParam(String network, int nwIndex, int epIndex, {Function connectionTerminator, Function modalBottomSetState});
+  void setNetworkParam(String network, int nwIndex, int epIndex);
 
   Future<bool> validateMnemonic(String seed);
   Future<List<dynamic>> importSeed(String seed, {KeyType keyType = KeyType.mnemonic, String? name = "Username", required String? pin});

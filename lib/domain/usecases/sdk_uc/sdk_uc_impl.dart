@@ -110,19 +110,17 @@ class BitrielSDKImpl implements BitrielSDKUseCase{
   }
 
   /// Change Network Perform From Sdk Provider
+  /// ep => endpoint
   @override
-  Future<void> setNetworkParam(String network, int nwIndex, int epIndex, {Function? connectionTerminator, Function? modalBottomSetState}) async {
-
+  Future<void> setNetworkParam(String network, int nwIndex, int epIndex) async {
+    
     // Set Network Param with New Network Selected
     sdkRepoImpl.setNetworkParam(network: lstSelendraNetwork[nwIndex].lstNetwork![epIndex]);
-    
+
     // Check If Current Index Selected
     if ( (connectedIndex != epIndex && networkIndex == nwIndex) || connectedIndex != nwIndex ){
 
-      /// Call Timer To Handle Connection
-      AppUtils.timer( () async { await sdkRepoImpl.connectNode(jsCode: jsFile!); }, connectionTerminator!, modalBottomSetState!);
-
-      // if (networkIndex != nwIndex ) networkIndex = nwIndex;
+      await sdkRepoImpl.connectNode(jsCode: jsFile!);
 
     }
 

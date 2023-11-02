@@ -49,6 +49,8 @@ class LetsExchangeUCImpl implements LetsExchangeUseCases {
       _secureStorageImpl.readSecure(DbKey.lstTxIds)!.then( (localLstTx){
 
         lstTx.value.clear();
+        
+        print("localLstTx $localLstTx");
 
         // ignore: unnecessary_null_comparison
         if (localLstTx.isNotEmpty){
@@ -253,6 +255,7 @@ class LetsExchangeUCImpl implements LetsExchangeUseCases {
         else if (value.statusCode == 200) {
 
           lstTx.value.add(SwapResModel.fromJson(json.decode(value.body)));
+          
           // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
           lstTx.notifyListeners();
           

@@ -19,10 +19,10 @@ class MainScreen extends StatelessWidget {
           body: PageView(
             onPageChanged: navbarUsecaseImpl.changeIndex,
             controller: navbarUsecaseImpl.pageController,
-            children: const [
+            children: [
               HomeScreen(),
-              WalletScreen(),
-              SettingScreen()
+              const WalletScreen(),
+              const SettingScreen()
             ],
           ),
           bottomNavigationBar: ValueListenableBuilder(

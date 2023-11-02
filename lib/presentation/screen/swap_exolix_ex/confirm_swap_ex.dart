@@ -66,10 +66,29 @@ class ConfirmSwapExchange extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
           
-                    MyTextConstant(
-                      text: "${swapResModel!.amount} ${swapResModel.coinFrom!.coinCode}",
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
+                    Row(
+                      children: [
+
+                        MyTextConstant(
+                          text: "${swapResModel!.amount} ${swapResModel.coinFrom!.coinCode}",
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+
+                        Container(
+                          margin: const EdgeInsets.only(left: 10),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.cyanAccent
+                          ),
+                          child: MyTextConstant(
+                            text: "${swapResModel.coinFrom!.networkShortName}",
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     )
                   ],
                 )
@@ -108,10 +127,36 @@ class ConfirmSwapExchange extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
           
-                    MyTextConstant(
-                      text: swapResModel.amountTo,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
+                    
+                    Row(
+                      children: [
+
+                        MyTextConstant(
+                          text: swapResModel.amountTo,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+
+                        MyTextConstant(
+                          text: "${swapResModel!.amount} ${swapResModel.coinTo!.coinCode}",
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+
+                        Container(
+                          margin: const EdgeInsets.only(left: 10),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.cyanAccent
+                          ),
+                          child: MyTextConstant(
+                            text: "${swapResModel.coinTo!.networkShortName}",
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     )
                   ],
                 )

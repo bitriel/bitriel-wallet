@@ -24,6 +24,7 @@ class DbKey {
   static String txtHistory = "txthistory_key";
   /// Lets Exchange Transaction Ids
   static String lstTxIds = "lstTxIds_key";
+  static String lstExolicTxIds_key = "lstExolicTxIds_key";
 
   static String themeMode = "themeMode_key";
   static String signData = "signData_key";

@@ -64,6 +64,7 @@ class ExolixSwapModel {
       "networkTo": networkTo,
       "amount": amt!.value,
       "withdrawalAddress": withdrawalAddress,
+      "refundAddress": coinFrom
     };
   }
 }

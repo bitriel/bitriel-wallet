@@ -35,6 +35,8 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
   
   ValueNotifier<bool> isReady = ValueNotifier(false);
 
+  ValueNotifier<bool> isQueryStatus = ValueNotifier(false);
+
   int? index;
 
   set setContext(BuildContext ctx){
@@ -55,9 +57,11 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
 
     if (lstTx.value[0] == null){
 
-      _secureStorageImpl.readSecure(DbKey.lstTxIds)!.then( (localLstTx){
+      _secureStorageImpl.readSecure(DbKey.lstExolicTxIds_key)!.then( (localLstTx){
 
         lstTx.value.clear();
+
+        print("localLstTx $localLstTx");
 
         // ignore: unnecessary_null_comparison
         if (localLstTx.isNotEmpty){
@@ -227,7 +231,7 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
   @override
   Future<void> exolixSwap() async {
 
-    try {
+    // try {
 
       // Response value = Response(json.encode(map), 200);
 
@@ -248,10 +252,11 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
         else if (value.statusCode == 201) {
 
           lstTx.value.add(ExolixSwapResModel.fromJson(json.decode(value.body)));
+
           // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
           lstTx.notifyListeners();
           
-          await SecureStorageImpl().writeSecure(DbKey.lstTxIds, value.body);
+          await SecureStorageImpl().writeSecure(DbKey.lstExolicTxIds_key, json.encode(ExolixSwapResModel().toJson(lstTx.value)));
 
           // Close Dialog
           Navigator.pop(_context!);
@@ -273,19 +278,19 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
         }
       });
 
-    } catch (e) {
+    // } catch (e) {
 
-      print(e);
+    //   print(e);
 
-      // Close Dialog
-      Navigator.pop(_context!);
+    //   // Close Dialog
+    //   Navigator.pop(_context!);
       
-      await QuickAlert.show(
-        context: _context!,
-        type: QuickAlertType.error,
-        text: '$e',
-      );
-    }
+    //   await QuickAlert.show(
+    //     context: _context!,
+    //     type: QuickAlertType.error,
+    //     text: '$e',
+    //   );
+    // }
   }
 
   // Index Of List
@@ -333,7 +338,7 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
 
       await Navigator.pushReplacement(
         _context!,
-        MaterialPageRoute(builder: (context) => TokenPayment(index: index, address: swapResModel.withdrawalAddress, amt: swapResModel.amount,))
+        MaterialPageRoute(builder: (context) => TokenPayment(index: index, address: swapResModel.depositAddress, amt: swapResModel.amount,))
       );
       
     } else {
@@ -359,10 +364,15 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
 
   /// This function for update status inside details
   Future<void> getStatus() async {
+
+    print("getStatus");
+    isQueryStatus.value = true;
     
     dialogLoading(_context!, content: "Checking Status");
 
     await _exolixExchangeRepoImpl.getExolixExStatusByTxId(lstTx.value[index!]!.id!).then((value) {
+
+      print("value ${value.body}");
       
       lstTx.value[index!] = ExolixSwapResModel.fromJson(json.decode(value.body));
 
@@ -371,7 +381,9 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
     // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
     lstTx.notifyListeners();
 
-    await SecureStorageImpl().writeSecure(DbKey.lstTxIds, json.encode(ExolixSwapResModel().toJson(lstTx.value)));
+    await SecureStorageImpl().writeSecure(DbKey.lstExolicTxIds_key, json.encode(ExolixSwapResModel().toJson(lstTx.value)));
+
+    
 
     // Close Dialog
     Navigator.pop(_context!);

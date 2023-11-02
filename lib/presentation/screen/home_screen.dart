@@ -1,12 +1,17 @@
+import 'package:bitriel_wallet/domain/usecases/home_uc/home.uc.impl.dart';
 import 'package:bitriel_wallet/index.dart';
 import 'package:bitriel_wallet/presentation/screen/swap_exolix_ex/swap_ex_screen.dart';
 
 class HomeScreen extends StatelessWidget {
 
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
+
+  final HomeUcImpl _homeUcImpl = HomeUcImpl();
 
   @override
   Widget build(BuildContext context) {
+
+    _homeUcImpl.setBuildContext = context;
     
     final walletProvider = Provider.of<WalletProvider>(context, listen: false);
 
@@ -89,11 +94,14 @@ class HomeScreen extends StatelessWidget {
                           asset: "assets/icons/exchange.png",
                           hexColor: "#219EBC",
                           action: () {
-                            Navigator.push(
-                              context,
-                              // MaterialPageRoute(builder: (builder) => SwapExchange())
-                              MaterialPageRoute(builder: (builder) => SwapExolicExchange())
-                            );
+
+                            _homeUcImpl.swapOption();
+
+                            // Navigator.push(
+                            //   context,
+                            //   // MaterialPageRoute(builder: (builder) => SwapExchange())
+                            //   MaterialPageRoute(builder: (builder) => SwapExolicExchange())
+                            // );
                           },
                         ),
                       ),

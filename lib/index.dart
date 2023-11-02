@@ -133,6 +133,7 @@ export 'package:bitriel_wallet/domain/usecases/swap_uc/lets_exchange_uc/lets_ex_
 export 'package:bitriel_wallet/domain/usecases/wallet_uc/receive_uc.dart';
 export 'package:bitriel_wallet/domain/usecases/scan_qr_uc/scan_qr_uc.dart';
 export 'package:bitriel_wallet/domain/usecases/scan_qr_uc/scan_qr_uc_impl.dart';
+export 'package:bitriel_wallet/domain/usecases/home_uc/home.usecase.dart';
 
 /*---------- Presentation Layer ----------*/
 
@@ -178,6 +179,7 @@ export 'package:bitriel_wallet/presentation/widget/shimmer_market_widget.dart';
 export 'package:bitriel_wallet/presentation/widget/dropdown_widget.dart';
 export 'package:bitriel_wallet/presentation/widget/swap_numpad_c.dart';
 export 'package:bitriel_wallet/presentation/screen/main_screen.dart';
+export 'package:bitriel_wallet/presentation/screen/swap_exolix_ex/swap_ex_screen.dart';
 
 // Provider
 export 'package:bitriel_wallet/presentation/provider/asset_pro.dart';

@@ -33,6 +33,18 @@ class ExolixCoin {
     icon = jsn['icon'];
     memoName = jsn['memoName'];
   }
+
+  toJson(){
+    return {
+      "coinCode": coinCode,
+      "coinName": coinName,
+      "network": network,
+      "networkName": networkName,
+      "networkShortName": networkShortName,
+      "icon": icon,
+      "memoName": memoName
+    };
+  }
   
 }
 

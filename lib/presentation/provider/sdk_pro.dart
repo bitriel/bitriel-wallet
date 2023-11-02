@@ -82,7 +82,7 @@ class SDKProvider with ChangeNotifier {
 
       isConnected = false;
 
-      await _sdkImpl.setNetworkParam(nwModel.network == Network.Mainnet ? "Mainnet" : "Testnet", nwIndex, epIndex, connectionTerminator: connectionTerminator, modalBottomSetState: modalBottomSetState);
+      await _sdkImpl.setNetworkParam(nwModel.network == Network.Mainnet ? "Mainnet" : "Testnet", nwIndex, epIndex);
     }
   }
 
@@ -90,52 +90,52 @@ class SDKProvider with ChangeNotifier {
   /// 
   /// connectionTerminator not inside sdk_uc because we need to use notifyListeners of Sdk Provider.
   /// 
-  void connectionTerminator(bool isSuccess, Function changeModalBottomState) async {
+  // void connectionTerminator(bool isSuccess, Function changeModalBottomState) async {
 
-    // Close Dialog Loading
-    // ignore: use_build_context_synchronously
-    Navigator.pop(_sdkImpl.context!);
-    // Close modalBottomDialog
-    Navigator.pop(_sdkImpl.context!);
+  //   // Close Dialog Loading
+  //   // ignore: use_build_context_synchronously
+  //   Navigator.pop(_sdkImpl.context!);
+  //   // Close modalBottomDialog
+  //   Navigator.pop(_sdkImpl.context!);
     
-    if (isSuccess == true) {
+  //   if (isSuccess == true) {
       
-      changeModalBottomState(() {});
+  //     changeModalBottomState(() {});
 
-      _sdkImpl.networkIndex = _sdkImpl.networkIndex == 0 ? 1 : 0;
-      _sdkImpl.connectedIndex = _sdkImpl.connectedIndex == 0 ? 1 : 0;
+  //     _sdkImpl.networkIndex = _sdkImpl.networkIndex == 0 ? 1 : 0;
+  //     _sdkImpl.connectedIndex = _sdkImpl.connectedIndex == 0 ? 1 : 0;
       
-      isConnected = true;
+  //     isConnected = true;
 
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(_sdkImpl.context!).showSnackBar(
-        const SnackBar(content: Text("Connection Success"))
-      );
+  //     // ignore: use_build_context_synchronously
+  //     ScaffoldMessenger.of(_sdkImpl.context!).showSnackBar(
+  //       const SnackBar(content: Text("Connection Success"))
+  //     );
         
-      // Store Index of new Network connect successful.
-      await SecureStorage.writeData(key: DbKey.connectedIndex, encodeValue: json.encode(_sdkImpl.connectedIndex));
-    }
+  //     // Store Index of new Network connect successful.
+  //     await SecureStorage.writeData(key: DbKey.connectedIndex, encodeValue: json.encode(_sdkImpl.connectedIndex));
+  //   }
 
-    // Connection Failed
-    else {
+  //   // Connection Failed
+  //   else {
 
-      // In this connect failed:
-      // Reset Set Param To previous Network sdk_uc_impl.dart file line 83
-      _sdkImpl.setNetworkParam(_sdkImpl.lstSelendraNetwork[_sdkImpl.networkIndex].lstNetwork![_sdkImpl.connectedIndex], _sdkImpl.networkIndex, _sdkImpl.connectedIndex);
+  //     // In this connect failed:
+  //     // Reset Set Param To previous Network sdk_uc_impl.dart file line 83
+  //     _sdkImpl.setNetworkParam(_sdkImpl.lstSelendraNetwork[_sdkImpl.networkIndex].lstNetwork![_sdkImpl.connectedIndex], _sdkImpl.networkIndex, _sdkImpl.connectedIndex);
 
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(_sdkImpl.context!).showSnackBar(
-        const SnackBar(content: Text("Connect RP1 failed"))
-      );
+  //     // ignore: use_build_context_synchronously
+  //     ScaffoldMessenger.of(_sdkImpl.context!).showSnackBar(
+  //       const SnackBar(content: Text("Connect RP1 failed"))
+  //     );
 
-      await _sdkImpl.sdkRepoImpl.connectNode(jsCode: _sdkImpl.jsFile!);
+  //     await _sdkImpl.sdkRepoImpl.connectNode(jsCode: _sdkImpl.jsFile!);
       
-    }
+  //   }
 
-    connectFailed = isSuccess;
+  //   connectFailed = isSuccess;
     
-    notifyListeners();
-  }
+  //   notifyListeners();
+  // }
   
   Future<List<dynamic>> importSeed(String seed, String pwd) async {
     return await _sdkImpl.importSeed(seed, pin: pwd);

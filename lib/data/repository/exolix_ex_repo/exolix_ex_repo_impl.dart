@@ -39,6 +39,6 @@ class ExolixExchangeRepoImpl implements ExolixExchangeRepository {
 
   @override
   Future<Response> getExolixExStatusByTxId(String txId) async {
-    return await GetRequest.getLetsExStatusByTxId(txId);
+    return await GetRequest.getExolixExStatusByTxId(txId);
   }
 }
