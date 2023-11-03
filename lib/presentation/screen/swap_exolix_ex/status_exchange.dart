@@ -16,10 +16,10 @@ class StatusExolixExchange extends StatelessWidget {
         children: [
 
           ValueListenableBuilder(
-            valueListenable: exolixExchangeUCImpl!.lstTx,
+            valueListenable: exolixExchangeUCImpl!.isReady,
             builder: (context, lst, wg) {
 
-              if (lst.isEmpty){
+              if (exolixExchangeUCImpl!.lstTx!.isEmpty){
                 return Center(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -48,7 +48,7 @@ class StatusExolixExchange extends StatelessWidget {
               }
 
               // ignore: curly_braces_in_flow_control_structures, unnecessary_null_comparison
-              else if (lst[0] == null) return Expanded(
+              else if (lst == null) return Expanded(
                 child: Shimmer.fromColors(
                   baseColor: Colors.grey[300]!,
                   highlightColor: Colors.grey[100]!,
@@ -69,8 +69,8 @@ class StatusExolixExchange extends StatelessWidget {
               
               return ListView(
                 shrinkWrap: true,
-                children: lst.map((e) {
-                  return _statusSwapRes(exolixExchangeUCImpl: exolixExchangeUCImpl!, index: lst.indexOf(e));
+                children: exolixExchangeUCImpl!.lstTx!.map((e) {
+                  return _statusSwapRes(exolixExchangeUCImpl: exolixExchangeUCImpl!, index: exolixExchangeUCImpl!.lstTx!.indexOf(e));
                 }).toList(),
               );
             }
@@ -89,19 +89,25 @@ class StatusExolixExchange extends StatelessWidget {
           exolixExchangeUCImpl.exolixConfirmSwap(index);
         },
         title: MyTextConstant(
-          text: "Exchange ID: ${exolixExchangeUCImpl.lstTx.value[index!]!.id}",
+          text: "Exchange ID: ${exolixExchangeUCImpl.lstTx![index!].id}",
           fontWeight: FontWeight.bold,
           textAlign: TextAlign.start,
         ),
         subtitle: MyTextConstant(
-          text: "Status: ${exolixExchangeUCImpl.lstTx.value[index]!.createdAt}",
+          text: "Status: ${exolixExchangeUCImpl.lstTx![index].createdAt}",
           color2: hexaCodeToColor(AppColors.iconGreyColor),
           textAlign: TextAlign.start,
         ),
-        trailing: MyTextConstant(
-          text: "Status: ${exolixExchangeUCImpl.lstTx.value[index]!.status}",
-          color2: hexaCodeToColor(AppColors.primary),
-          textAlign: TextAlign.end,
+        trailing: ValueListenableBuilder(
+          valueListenable: exolixExchangeUCImpl.statusNotifier,
+          builder: (context, statusNotifier, wg) {
+
+            return MyTextConstant(
+              text: "Status: ${exolixExchangeUCImpl.lstTx![index].status}",
+              color2: hexaCodeToColor(AppColors.primary),
+              textAlign: TextAlign.end,
+            );
+          }
         ),
       ),
     );

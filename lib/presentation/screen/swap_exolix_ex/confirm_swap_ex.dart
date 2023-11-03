@@ -2,16 +2,19 @@ import 'package:bitriel_wallet/index.dart';
 
 class ConfirmSwapExchange extends StatelessWidget {
 
+  final ValueNotifier<bool>? statusNotifier;
   final ExolixSwapResModel? swapResModel;
 
   final Function? confirmSwap;
 
   final Function? getStatus;
   
-  const ConfirmSwapExchange({super.key, required this.swapResModel, required this.confirmSwap, this.getStatus});
+  const ConfirmSwapExchange({required this.statusNotifier, super.key, required this.swapResModel, required this.confirmSwap, this.getStatus});
 
   @override
   Widget build(BuildContext context) {
+
+    print("swapResModel ${swapResModel!.status}");
     return Scaffold(
       appBar: appBar(context, title: "Swap"),
       body: Column(
@@ -204,7 +207,7 @@ class ConfirmSwapExchange extends StatelessWidget {
                       icon: Icon(Iconsax.copy, color: hexaCodeToColor(AppColors.primary), size: 20),
                       onPressed: () async {
                         Clipboard.setData(
-                          ClipboardData(text: swapResModel.depositAddress!.replaceRange(6, swapResModel.depositAddress!.length - 6, ".......")),
+                          ClipboardData(text: swapResModel!.depositAddress!.replaceRange(6, swapResModel!.depositAddress!.length - 6, ".......")),
                         );
                         /* Copy Text */
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -238,7 +241,7 @@ class ConfirmSwapExchange extends StatelessWidget {
                       icon: Icon(Iconsax.copy, color: hexaCodeToColor(AppColors.primary), size: 20),
                       onPressed: () async {
                         Clipboard.setData(
-                          ClipboardData(text: swapResModel.depositAddress!),
+                          ClipboardData(text: swapResModel!.depositAddress!),
                         );
                         /* Copy Text */
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -285,7 +288,7 @@ class ConfirmSwapExchange extends StatelessWidget {
           InkWell(
             onTap: () {
               Clipboard.setData(
-                ClipboardData(text: swapResModel.id!),
+                ClipboardData(text: swapResModel!.id!),
               );
               /* Copy Text */
               ScaffoldMessenger.of(context).showSnackBar(
@@ -348,12 +351,18 @@ class ConfirmSwapExchange extends StatelessWidget {
           
                             const SizedBox(height: 2.5,),
                             
-                            MyTextConstant(
-                              text: "${swapResModel.status}",
-                              color2: hexaCodeToColor(AppColors.primary),
-                              textAlign: TextAlign.start,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            ValueListenableBuilder(
+                              valueListenable: statusNotifier!,
+                              builder: (context, statusNotifier, wg) {
+                                
+                                print("statusNotifier $statusNotifier");
+                                return MyTextConstant(
+                                  text: "Status: ${swapResModel!.status}",
+                                  color2: hexaCodeToColor(AppColors.primary),
+                                  textAlign: TextAlign.end,
+                                );
+                              }
+                            )
                       
                           ],
                         ),
@@ -363,8 +372,12 @@ class ConfirmSwapExchange extends StatelessWidget {
 
                       IconButton(
                         icon: Icon(Iconsax.refresh_circle, color: hexaCodeToColor(AppColors.orangeColor)),
-                        onPressed: () {
-                          getStatus();
+                        onPressed: () async {
+
+                          swapResModel = await getStatus();
+
+                          // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
+                          statusNotifier!.notifyListeners();
                         },  
                       )
                       

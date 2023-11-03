@@ -31,11 +31,11 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
 
   ValueNotifier<List<ExolixExCoinByNetworkModel>> lstLECoin = ValueNotifier([]);
 
-  ValueNotifier<List<ExolixSwapResModel?>> lstTx = ValueNotifier([null]);
+  List<ExolixSwapResModel>? lstTx;
   
   ValueNotifier<bool> isReady = ValueNotifier(false);
 
-  ValueNotifier<bool> isQueryStatus = ValueNotifier(false);
+  ValueNotifier<bool> statusNotifier = ValueNotifier(false);
 
   int? index;
 
@@ -55,24 +55,24 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
       defaultLstCoins = await _exolixExchangeRepoImpl.getExolixExchangeCoin();
     }
 
-    if (lstTx.value[0] == null){
+    if (lstTx == null){
 
-      _secureStorageImpl.readSecure(DbKey.lstExolicTxIds_key)!.then( (localLstTx){
+      await _secureStorageImpl.readSecure(DbKey.lstExolicTxIds_key)!.then( (localLstTx){
 
-        lstTx.value.clear();
-
-        print("localLstTx $localLstTx");
+        lstTx?.clear();
 
         // ignore: unnecessary_null_comparison
         if (localLstTx.isNotEmpty){
 
-          lstTx.value = List<Map<String, dynamic>>.from((json.decode(localLstTx))).map((e) {
+          lstTx = List<Map<String, dynamic>>.from((json.decode(localLstTx))).map((e) {
             return ExolixSwapResModel.fromJson(e);
           }).toList();
+
+          lstTx?[1].status = "waiting";
         }
 
         // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-        lstTx.notifyListeners();
+        isReady.notifyListeners();
 
       });
     }
@@ -251,12 +251,12 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
 
         else if (value.statusCode == 201) {
 
-          lstTx.value.add(ExolixSwapResModel.fromJson(json.decode(value.body)));
+          lstTx?.add(ExolixSwapResModel.fromJson(json.decode(value.body)));
 
           // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-          lstTx.notifyListeners();
+          isReady.notifyListeners();
           
-          await SecureStorageImpl().writeSecure(DbKey.lstExolicTxIds_key, json.encode(ExolixSwapResModel().toJson(lstTx.value)));
+          await SecureStorageImpl().writeSecure(DbKey.lstExolicTxIds_key, json.encode(ExolixSwapResModel().toJson(lstTx!)));
 
           // Close Dialog
           Navigator.pop(_context!);
@@ -270,7 +270,7 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
             confirmBtnText: "Confirm",
             text: 'Swap Successfully!',
             onConfirmBtnTap: () async {
-              await exolixConfirmSwap(lstTx.value.length-1);
+              await exolixConfirmSwap(lstTx!.length - 1);
             },
           );
         } else {
@@ -301,8 +301,8 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
       MaterialPageRoute(builder: (context) => const PincodeScreen(title: '', label: PinCodeLabel.fromSendTx,))
     ).then((value) async {
 
-      _paymentUcImpl.recipientController.text = lstTx.value[index]!.depositAddress!;
-      _paymentUcImpl.amountController.text = lstTx.value[index]!.amount!;
+      _paymentUcImpl.recipientController.text = lstTx![index].depositAddress!;
+      _paymentUcImpl.amountController.text = lstTx![index].amount!;
 
       if (value != null){
         await _paymentUcImpl.sendBep20();
@@ -313,10 +313,11 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
 
   @override
   Future<void> exolixConfirmSwap(int indx) async {
+    
     index = indx;
     Navigator.push(
       _context!,
-      MaterialPageRoute(builder: (context) => exo_confirm_swap.ConfirmSwapExchange(swapResModel: lstTx.value[indx], confirmSwap: exolixSwapping, getStatus: getStatus))
+      MaterialPageRoute(builder: (context) => exo_confirm_swap.ConfirmSwapExchange(statusNotifier: statusNotifier, swapResModel: lstTx?[indx], confirmSwap: exolixSwapping, getStatus: getStatus))
     );
   }
 
@@ -363,30 +364,28 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
   }
 
   /// This function for update status inside details
-  Future<void> getStatus() async {
+  Future<ExolixSwapResModel> getStatus() async {
 
-    print("getStatus");
-    isQueryStatus.value = true;
-    
     dialogLoading(_context!, content: "Checking Status");
 
-    await _exolixExchangeRepoImpl.getExolixExStatusByTxId(lstTx.value[index!]!.id!).then((value) {
-
-      print("value ${value.body}");
+    await _exolixExchangeRepoImpl.getExolixExStatusByTxId(lstTx![index!].id!).then((value) {
       
-      lstTx.value[index!] = ExolixSwapResModel.fromJson(json.decode(value.body));
+      print("value ${json.decode(value.body)['status']}");
+      lstTx?[index!] = ExolixSwapResModel.fromJson(json.decode(value.body));
+
+      print("getStatus ${lstTx?[index!].status}");
 
     });
 
+    await SecureStorageImpl().writeSecure(DbKey.lstExolicTxIds_key, json.encode(ExolixSwapResModel().toJson(lstTx!)));
+
     // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-    lstTx.notifyListeners();
-
-    await SecureStorageImpl().writeSecure(DbKey.lstExolicTxIds_key, json.encode(ExolixSwapResModel().toJson(lstTx.value)));
-
-    
+    statusNotifier.notifyListeners();
 
     // Close Dialog
     Navigator.pop(_context!);
+
+    return lstTx![index!];
   }
 
 }
