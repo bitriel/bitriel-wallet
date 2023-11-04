@@ -7,12 +7,12 @@ class TokenPayment extends StatelessWidget {
   final String? address;
   final String? amt;
   
-  const TokenPayment({Key? key, this.index, this.address, this.amt}) : super(key: key);
+  TokenPayment({Key? key, this.index, this.address, this.amt}) : super(key: key);
+  
+  final PaymentUcImpl paymentUcImpl = PaymentUcImpl();
 
   @override
   Widget build(BuildContext context) { 
-
-    final PaymentUcImpl paymentUcImpl = PaymentUcImpl();
 
     paymentUcImpl.setBuildContext = context;
 
@@ -38,7 +38,9 @@ class TokenPayment extends StatelessWidget {
             ValueListenableBuilder(
               valueListenable: paymentUcImpl.index, 
               builder: (context, value, wg){
+
                 if (paymentUcImpl.lstContractDropDown.isEmpty) return const SizedBox();
+                
                 return Container(
                   margin: const EdgeInsets.only(right: 16.0, left: 16.0, top: 8.0, bottom: 0.0),
                   child: Card(
@@ -64,6 +66,7 @@ class TokenPayment extends StatelessWidget {
                       ),
                       subtitle: Row(
                         children: [
+
                           MyTextConstant(
                             text: "${paymentUcImpl.lstContractDropDown[value].name!} (${paymentUcImpl.lstContractDropDown[value].symbol!})",
                             textAlign: TextAlign.start,
@@ -120,8 +123,7 @@ class TokenPayment extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           buttonColor: value == false ? AppColors.grey : AppColors.primaryBtn,
                           opacity: 1,
-                          action: 
-                          // value == false ? null : 
+                          action: value == false ? null : 
                           () async {
                             
                             await paymentUcImpl.submitTrx();

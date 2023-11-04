@@ -25,10 +25,30 @@ class StatusExchange extends StatelessWidget {
           // ),
 
           ValueListenableBuilder(
-            valueListenable: letsExchangeUCImpl!.lstTx,
-            builder: (context, lst, wg) {
+            valueListenable: letsExchangeUCImpl!.isReady,
+            builder: (context, isReady, wg) {
 
-              if (lst.isEmpty){
+              if (letsExchangeUCImpl!.lstTx == null) {
+                return Expanded(
+                  child: Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: ListView.builder(
+                    itemCount: 6,
+                    itemBuilder: (context, index) {
+                      return Card(
+                      elevation: 1.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const SizedBox(height: 80),
+                      );
+                    },
+                    ),
+                  )
+                );
+              }
+              else if (letsExchangeUCImpl!.lstTx!.isEmpty){
                 return Center(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -55,31 +75,11 @@ class StatusExchange extends StatelessWidget {
                   ),
                 );
               }
-
-              // ignore: curly_braces_in_flow_control_structures, unnecessary_null_comparison
-              else if (lst[0] == null) return Expanded(
-                child: Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
-                  child: ListView.builder(
-                  itemCount: 6,
-                  itemBuilder: (context, index) {
-                    return Card(
-                    elevation: 1.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: const SizedBox(height: 80),
-                    );
-                  },
-                  ),
-                )
-              );
               
               return ListView(
                 shrinkWrap: true,
-                children: lst.map((e) {
-                  return _statusSwapRes(letsExchangeUCImpl: letsExchangeUCImpl!, index: lst.indexOf(e));
+                children: letsExchangeUCImpl!.lstTx!.map((e) {
+                  return _statusSwapRes(letsExchangeUCImpl: letsExchangeUCImpl!, index: letsExchangeUCImpl!.lstTx!.indexOf(e));
                 }).toList(),
               );
             }
@@ -98,19 +98,24 @@ class StatusExchange extends StatelessWidget {
           letsExchangeUCImpl.confirmSwap(index);
         },
         title: MyTextConstant(
-          text: "Exchange ID: ${letsExchangeUCImpl.lstTx.value[index!]!.transaction_id}",
+          text: "Exchange ID: ${letsExchangeUCImpl.lstTx![index!].transaction_id}",
           fontWeight: FontWeight.bold,
           textAlign: TextAlign.start,
         ),
         subtitle: MyTextConstant(
-          text: "Status: ${letsExchangeUCImpl.lstTx.value[index]!.created_at}",
+          text: "Status: ${tzToDateTime(letsExchangeUCImpl.lstTx![index].created_at!)}",
           color2: hexaCodeToColor(AppColors.iconGreyColor),
           textAlign: TextAlign.start,
         ),
-        trailing: MyTextConstant(
-          text: "Status: ${letsExchangeUCImpl.lstTx.value[index]!.status}",
-          color2: hexaCodeToColor(AppColors.primary),
-          textAlign: TextAlign.end,
+        trailing: ValueListenableBuilder(
+          valueListenable: letsExchangeUCImpl.statusNotifier,
+          builder: (context, statuNotifer, wg){
+            return MyTextConstant(
+              text: "Status: ${letsExchangeUCImpl.lstTx![index].status}",
+              color2: hexaCodeToColor(AppColors.primary),
+              textAlign: TextAlign.end,
+            );
+          },
         ),
       ),
     );

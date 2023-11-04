@@ -1,4 +1,3 @@
-import 'package:bitriel_wallet/domain/usecases/swap_uc/exolix_uc/exolix_ex_uc_impl.dart';
 import 'package:bitriel_wallet/index.dart';
 
 class StatusExolixExchange extends StatelessWidget {
@@ -69,7 +68,7 @@ class StatusExolixExchange extends StatelessWidget {
               
               return ListView(
                 shrinkWrap: true,
-                children: exolixExchangeUCImpl!.lstTx!.map((e) {
+                children: exolixExchangeUCImpl!.lstTx!.reversed.map((e) {
                   return _statusSwapRes(exolixExchangeUCImpl: exolixExchangeUCImpl!, index: exolixExchangeUCImpl!.lstTx!.indexOf(e));
                 }).toList(),
               );
@@ -94,7 +93,7 @@ class StatusExolixExchange extends StatelessWidget {
           textAlign: TextAlign.start,
         ),
         subtitle: MyTextConstant(
-          text: "Status: ${exolixExchangeUCImpl.lstTx![index].createdAt}",
+          text: "Status: ${tzToDateTime(exolixExchangeUCImpl.lstTx![index].createdAt!)}",
           color2: hexaCodeToColor(AppColors.iconGreyColor),
           textAlign: TextAlign.start,
         ),

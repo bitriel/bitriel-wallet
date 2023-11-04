@@ -2,13 +2,15 @@ import 'package:bitriel_wallet/index.dart';
 
 class ConfirmSwapExchange extends StatelessWidget {
 
+  final ValueNotifier<bool>? statusNotifier;
+
   final SwapResModel? swapResModel;
 
   final Function? confirmSwap;
 
   final Function? getStatus;
   
-  const ConfirmSwapExchange({super.key, required this.swapResModel, required this.confirmSwap, this.getStatus});
+  const ConfirmSwapExchange({required this.statusNotifier, super.key, required this.swapResModel, required this.confirmSwap, this.getStatus});
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +161,7 @@ class ConfirmSwapExchange extends StatelessWidget {
                       icon: Icon(Iconsax.copy, color: hexaCodeToColor(AppColors.primary), size: 20),
                       onPressed: () async {
                         Clipboard.setData(
-                          ClipboardData(text: swapResModel.deposit!.replaceRange(6, swapResModel.deposit!.length - 6, ".......")),
+                          ClipboardData(text: swapResModel!.deposit!.replaceRange(6, swapResModel!.deposit!.length - 6, ".......")),
                         );
                         /* Copy Text */
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -193,7 +195,7 @@ class ConfirmSwapExchange extends StatelessWidget {
                       icon: Icon(Iconsax.copy, color: hexaCodeToColor(AppColors.primary), size: 20),
                       onPressed: () async {
                         Clipboard.setData(
-                          ClipboardData(text: swapResModel.deposit!),
+                          ClipboardData(text: swapResModel!.deposit!),
                         );
                         /* Copy Text */
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -240,7 +242,7 @@ class ConfirmSwapExchange extends StatelessWidget {
           InkWell(
             onTap: () {
               Clipboard.setData(
-                ClipboardData(text: swapResModel.transaction_id!),
+                ClipboardData(text: swapResModel!.transaction_id!),
               );
               /* Copy Text */
               ScaffoldMessenger.of(context).showSnackBar(
@@ -303,12 +305,17 @@ class ConfirmSwapExchange extends StatelessWidget {
           
                             const SizedBox(height: 2.5,),
                             
-                            MyTextConstant(
-                              text: "${swapResModel.status}",
-                              color2: hexaCodeToColor(AppColors.primary),
-                              textAlign: TextAlign.start,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            ValueListenableBuilder(
+                              valueListenable: statusNotifier!,
+                              builder: (context, statusNotifier, wg) {
+                                
+                                return MyTextConstant(
+                                  text: "Status: ${swapResModel!.status}",
+                                  color2: hexaCodeToColor(AppColors.primary),
+                                  textAlign: TextAlign.end,
+                                );
+                              }
+                            )
                       
                           ],
                         ),
@@ -318,7 +325,7 @@ class ConfirmSwapExchange extends StatelessWidget {
 
                       IconButton(
                         icon: Icon(Iconsax.refresh_circle, color: hexaCodeToColor(AppColors.orangeColor)),
-                        onPressed: () {
+                        onPressed: () async {
                           // Clipboard.setData(
                           //   ClipboardData(text: swapResModel.deposit!),
                           // );
@@ -328,7 +335,10 @@ class ConfirmSwapExchange extends StatelessWidget {
                           //     content: Text("To Address is Copied to Clipboard"),
                           //   ),
                           // );
-                          getStatus();
+                          swapResModel = await getStatus();
+
+                          // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
+                          statusNotifier!.notifyListeners();
                         },  
                       )
                       

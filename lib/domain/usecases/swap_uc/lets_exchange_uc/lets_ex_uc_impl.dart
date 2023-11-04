@@ -25,7 +25,9 @@ class LetsExchangeUCImpl implements LetsExchangeUseCases {
 
   ValueNotifier<List<LetsExCoinByNetworkModel>> lstLECoin = ValueNotifier([]);
 
-  ValueNotifier<List<SwapResModel?>> lstTx = ValueNotifier([null]);
+  List<SwapResModel>? lstTx;
+  
+  ValueNotifier<bool> statusNotifier = ValueNotifier(false);
 
   int? index;
 
@@ -45,23 +47,24 @@ class LetsExchangeUCImpl implements LetsExchangeUseCases {
       defaultLstCoins = await _letsExchangeRepoImpl.getLetsExchangeCoin();
     }
 
-    if (lstTx.value[0] == null){
+    if (lstTx == null){
       _secureStorageImpl.readSecure(DbKey.lstTxIds)!.then( (localLstTx){
 
-        lstTx.value.clear();
+        lstTx = [];
         
         print("localLstTx $localLstTx");
 
         // ignore: unnecessary_null_comparison
         if (localLstTx.isNotEmpty){
 
-          lstTx.value = List<Map<String, dynamic>>.from((json.decode(localLstTx))).map((e) {
+          lstTx = List<Map<String, dynamic>>.from((json.decode(localLstTx))).map((e) {
             return SwapResModel.fromJson(e);
           }).toList();
+          
         }
 
         // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-        lstTx.notifyListeners();
+        isReady.value = true;
 
       });
     }
@@ -254,12 +257,9 @@ class LetsExchangeUCImpl implements LetsExchangeUseCases {
 
         else if (value.statusCode == 200) {
 
-          lstTx.value.add(SwapResModel.fromJson(json.decode(value.body)));
+          lstTx!.add(SwapResModel.fromJson(json.decode(value.body)));
           
-          // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-          lstTx.notifyListeners();
-          
-          await SecureStorageImpl().writeSecure(DbKey.lstTxIds, json.encode(SwapResModel().toJson(lstTx.value)));
+          await SecureStorageImpl().writeSecure(DbKey.lstTxIds, json.encode(SwapResModel().toJson(lstTx!)));
 
           // Close Dialog
           Navigator.pop(_context!);
@@ -273,7 +273,7 @@ class LetsExchangeUCImpl implements LetsExchangeUseCases {
             confirmBtnText: "Confirm",
             text: 'Swap Successfully!',
             onConfirmBtnTap: () {
-              confirmSwap(lstTx.value.length-1);
+              confirmSwap(lstTx!.length - 1);
             },
           );
         } else {
@@ -304,8 +304,8 @@ class LetsExchangeUCImpl implements LetsExchangeUseCases {
       MaterialPageRoute(builder: (context) => const PincodeScreen(title: '', label: PinCodeLabel.fromSendTx,))
     ).then((value) async {
 
-      _paymentUcImpl.recipientController.text = lstTx.value[index]!.deposit!;
-      _paymentUcImpl.amountController.text = lstTx.value[index]!.deposit_amount!;
+      _paymentUcImpl.recipientController.text = lstTx![index].deposit!;
+      _paymentUcImpl.amountController.text = lstTx![index].deposit_amount!;
 
       if (value != null){
         await _paymentUcImpl.sendBep20();
@@ -319,7 +319,7 @@ class LetsExchangeUCImpl implements LetsExchangeUseCases {
     index = indx;
     Navigator.push(
       _context!,
-      MaterialPageRoute(builder: (context) => ConfirmSwapExchange(swapResModel: lstTx.value[index!], confirmSwap: swapping, getStatus: getStatus))
+      MaterialPageRoute(builder: (context) => ConfirmSwapExchange( statusNotifier: statusNotifier, swapResModel: lstTx![index!], confirmSwap: swapping, getStatus: getStatus))
     );
   }
 
@@ -366,23 +366,22 @@ class LetsExchangeUCImpl implements LetsExchangeUseCases {
   }
 
   /// This function for update status inside details
-  Future<void> getStatus() async {
+  Future<SwapResModel> getStatus() async {
     
     dialogLoading(_context!, content: "Checking Status");
 
-    await _letsExchangeRepoImpl.getLetsExStatusByTxId(lstTx.value[index!]!.transaction_id!).then((value) {
+    await _letsExchangeRepoImpl.getLetsExStatusByTxId(lstTx![index!].transaction_id!).then((value) {
       
-      lstTx.value[index!] = SwapResModel.fromJson(json.decode(value.body));
+      lstTx![index!] = SwapResModel.fromJson(json.decode(value.body));
 
     });
 
-    // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-    lstTx.notifyListeners();
-
-    await SecureStorageImpl().writeSecure(DbKey.lstTxIds, json.encode(SwapResModel().toJson(lstTx.value)));
+    await SecureStorageImpl().writeSecure(DbKey.lstTxIds, json.encode(SwapResModel().toJson(lstTx!)));
 
     // Close Dialog
     Navigator.pop(_context!);
+
+    return lstTx![index!];
   }
 
 }

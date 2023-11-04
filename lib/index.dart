@@ -134,6 +134,7 @@ export 'package:bitriel_wallet/domain/usecases/wallet_uc/receive_uc.dart';
 export 'package:bitriel_wallet/domain/usecases/scan_qr_uc/scan_qr_uc.dart';
 export 'package:bitriel_wallet/domain/usecases/scan_qr_uc/scan_qr_uc_impl.dart';
 export 'package:bitriel_wallet/domain/usecases/home_uc/home.usecase.dart';
+export 'package:bitriel_wallet/domain/usecases/swap_uc/exolix_uc/exolix_ex_uc_impl.dart';
 
 /*---------- Presentation Layer ----------*/
 
@@ -156,7 +157,7 @@ export 'package:bitriel_wallet/presentation/screen/wallet/transaction_detail_scr
 export 'package:bitriel_wallet/presentation/screen/swap_lets_ex/select_swap_token_screen.dart';
 export 'package:bitriel_wallet/presentation/screen/about_screen.dart';
 export 'package:bitriel_wallet/presentation/screen/privacy_screen.dart';
-export 'package:bitriel_wallet/presentation/screen/swap_lets_ex/status_exchange.dart';
+export 'package:bitriel_wallet/presentation/screen/swap_lets_ex/lst_letsexchange_tx.exchange.dart';
 export 'package:bitriel_wallet/presentation/screen/account/backup_wallet_screen.dart';
 export 'package:bitriel_wallet/presentation/screen/swap_lets_ex/confirm_swap_ex.dart';
 export 'package:bitriel_wallet/presentation/screen/qr_scanner/qr_scanner_screen.dart';
@@ -194,3 +195,6 @@ export 'package:bitriel_wallet/standalone/utils/app_utils/global.dart';
 export 'package:bitriel_wallet/standalone/core/db_key_con.dart';
 export 'package:bitriel_wallet/standalone/utils/app_utils/fmt.dart';
 export 'package:bitriel_wallet/standalone/utils/app_utils/icon_path_util.dart';
+
+// Application Layer
+export 'package:bitriel_wallet/application/helper/helper.dart';

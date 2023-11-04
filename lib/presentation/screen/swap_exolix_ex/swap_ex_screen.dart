@@ -1,6 +1,6 @@
 import 'package:bitriel_wallet/domain/usecases/swap_uc/exolix_uc/exolix_ex_uc_impl.dart';
 import 'package:bitriel_wallet/index.dart';
-import 'package:bitriel_wallet/presentation/screen/swap_exolix_ex/status_exchange.dart';
+import 'package:bitriel_wallet/presentation/screen/swap_exolix_ex/lst_exolix_tx.exchange.dart';
 
 class SwapExolicExchange extends StatelessWidget {
   
@@ -35,17 +35,24 @@ class SwapExolicExchange extends StatelessWidget {
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (builder) => StatusExolixExchange(exolixExchangeUCImpl: exolicUCImpl,))
+          
+          ValueListenableBuilder(
+            valueListenable: exolicUCImpl.isReady,
+            builder: (context, isReady, wg) {
+
+              return TextButton(
+                onPressed: isReady == false ? null : () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (builder) => StatusExolixExchange(exolixExchangeUCImpl: exolicUCImpl,))
+                  );
+                }, 
+                child: MyTextConstant(
+                  text: "Status",
+                  color2: hexaCodeToColor(AppColors.primary),
+                ),
               );
-            }, 
-            child: MyTextConstant(
-              text: "Status",
-              color2: hexaCodeToColor(AppColors.primary),
-            ),
+            }
           )
         ],
       ),

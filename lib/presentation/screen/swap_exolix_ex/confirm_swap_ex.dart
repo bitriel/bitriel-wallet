@@ -3,6 +3,7 @@ import 'package:bitriel_wallet/index.dart';
 class ConfirmSwapExchange extends StatelessWidget {
 
   final ValueNotifier<bool>? statusNotifier;
+
   final ExolixSwapResModel? swapResModel;
 
   final Function? confirmSwap;
@@ -14,7 +15,6 @@ class ConfirmSwapExchange extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    print("swapResModel ${swapResModel!.status}");
     return Scaffold(
       appBar: appBar(context, title: "Swap"),
       body: Column(

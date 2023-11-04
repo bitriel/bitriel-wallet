@@ -48,8 +48,6 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
 
   @override
   Future<void> getExolixExchangeCoin() async {
-
-    print("getExolixExchangeCoin");
     
     if(defaultLstCoins.isEmpty){
       defaultLstCoins = await _exolixExchangeRepoImpl.getExolixExchangeCoin();
@@ -67,12 +65,11 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
           lstTx = List<Map<String, dynamic>>.from((json.decode(localLstTx))).map((e) {
             return ExolixSwapResModel.fromJson(e);
           }).toList();
-
-          lstTx?[1].status = "waiting";
         }
+        
 
         // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-        isReady.notifyListeners();
+        isReady.value = true;
 
       });
     }
@@ -231,7 +228,7 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
   @override
   Future<void> exolixSwap() async {
 
-    // try {
+    try {
 
       // Response value = Response(json.encode(map), 200);
 
@@ -278,19 +275,18 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
         }
       });
 
-    // } catch (e) {
+    } catch (e) {
 
-    //   print(e);
-
-    //   // Close Dialog
-    //   Navigator.pop(_context!);
+      // Close Dialog
+      Navigator.pop(_context!);
       
-    //   await QuickAlert.show(
-    //     context: _context!,
-    //     type: QuickAlertType.error,
-    //     text: '$e',
-    //   );
-    // }
+      await QuickAlert.show(
+        context: _context!,
+        type: QuickAlertType.error,
+        text: '$e',
+      );
+    }
+    
   }
 
   // Index Of List
@@ -378,9 +374,6 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
     });
 
     await SecureStorageImpl().writeSecure(DbKey.lstExolicTxIds_key, json.encode(ExolixSwapResModel().toJson(lstTx!)));
-
-    // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-    statusNotifier.notifyListeners();
 
     // Close Dialog
     Navigator.pop(_context!);

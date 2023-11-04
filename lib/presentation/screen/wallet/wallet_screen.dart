@@ -153,7 +153,7 @@ class WalletScreen extends StatelessWidget {
                 action: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const TokenPayment())
+                    MaterialPageRoute(builder: (context) => TokenPayment())
                   );
                 },
                 child: Row(

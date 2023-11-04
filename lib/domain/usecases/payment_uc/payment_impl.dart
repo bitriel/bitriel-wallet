@@ -32,6 +32,8 @@ class PaymentUcImpl implements PaymentUsecases {
   
   String? _pk;
 
+  String? hash;
+  
   TxHistoryModel? txHistoryModel;
 
   set setBuildContext(BuildContext ctx){
@@ -40,7 +42,6 @@ class PaymentUcImpl implements PaymentUsecases {
     _sdkProvider = Provider.of<SDKProvider>(ctx, listen: false);
   }
 
-  String? hash;
 
   void assetChanged(int value){
     index.value = value;
