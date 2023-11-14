@@ -1,9 +1,10 @@
-import 'package:bitriel_wallet/domain/model/exolix_ex_coin_m.dart';
+import 'package:bitriel_wallet/domain/model/exchange.model/exolix_ex_coin_m.dart';
+import 'package:bitriel_wallet/domain/usecases/swap_uc/exchange.i.dart';
 import 'package:bitriel_wallet/index.dart';
 
 class SelectSwapToken extends StatelessWidget {
 
-  final List<ExolixExCoinByNetworkModel> itemLE;
+  final List<ExchangeCoinI> itemLE;
 
   const SelectSwapToken({super.key, required this.itemLE});
 
@@ -79,13 +80,13 @@ class SelectSwapToken extends StatelessWidget {
         child: _buildImageItem(index),
       ),
       title: MyTextConstant(
-        text: itemLE[index].title ?? '',
+        text: itemLE[index].coinName ?? '',
         fontWeight: FontWeight.w600,
         fontSize: 17,
         textAlign: TextAlign.start,
       ),
       subtitle: MyTextConstant(
-        text: itemLE[index].network,
+        text: itemLE[index].networkName,
         color2: hexaCodeToColor(AppColors.grey),
         fontSize: 13,
         textAlign: TextAlign.start,

@@ -4,21 +4,13 @@ import 'package:bitriel_wallet/index.dart';
 class LetsExchangeRepoImpl implements LetsExchangeRepository {
 
   @override
-  Future<List<LetsExchangeCoin>> getLetsExchangeCoin() async{
+  Future<List<Map<String, dynamic>>> getLetsExchangeCoin() async{
     
-    List<LetsExchangeCoin> lstLECoin = [];
-    
-    await GetRequest.getLetsExchangeCoin().then((value) {
-      if (value.statusCode == 200) {
-        var json = jsonDecode(value.body);
-        for (var jsonLECoin in json){
-          var leCoin = LetsExchangeCoin.fromJson(jsonLECoin);
-          lstLECoin.add(leCoin);
-        }
-      }
+    return await GetRequest.getLetsExchangeCoin().then((value) {
+      return List<Map<String, dynamic>>.from(jsonDecode(value.body));
     });
 
-    return lstLECoin;
+    // return lstLECoin;
 
   }
 

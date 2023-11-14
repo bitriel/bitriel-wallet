@@ -98,7 +98,7 @@ class StatusExolixExchange extends StatelessWidget {
           textAlign: TextAlign.start,
         ),
         trailing: ValueListenableBuilder(
-          valueListenable: exolixExchangeUCImpl.statusNotifier,
+          valueListenable: ValueNotifier(false),
           builder: (context, statusNotifier, wg) {
 
             return MyTextConstant(

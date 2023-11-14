@@ -1,4 +1,4 @@
-import 'package:bitriel_wallet/domain/model/exolix_ex_coin_m.dart';
+import 'package:bitriel_wallet/domain/model/exchange.model/exolix_ex_coin_m.dart';
 import 'package:bitriel_wallet/index.dart';
 
 class SwapModel {

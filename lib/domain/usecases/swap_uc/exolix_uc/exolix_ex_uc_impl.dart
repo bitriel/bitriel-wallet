@@ -1,29 +1,28 @@
 import 'package:bitriel_wallet/data/repository/exolix_ex_repo/exolix_ex_repo_impl.dart';
-import 'package:bitriel_wallet/domain/model/exolix_ex_coin_m.dart';
+import 'package:bitriel_wallet/domain/model/exchange.model/exolix_ex_coin_m.dart';
+import 'package:bitriel_wallet/domain/usecases/swap_uc/exchange.i.dart';
 import 'package:bitriel_wallet/domain/usecases/swap_uc/exolix_uc/exolix_ex_uc.dart';
 import 'package:bitriel_wallet/index.dart';
-import 'package:bitriel_wallet/presentation/screen/swap_exolix_ex/select_swap_token_screen.dart' as exo_swap_screen;
-import 'package:bitriel_wallet/presentation/screen/swap_exolix_ex/confirm_swap_ex.dart' as exo_confirm_swap;
+import 'package:bitriel_wallet/presentation/screen/exchange/swap_exolix_ex/select_swap_token_screen.dart' as exo_swap_screen;
+import 'package:bitriel_wallet/presentation/screen/exchange/swap_exolix_ex/confirm_swap_ex.dart' as exo_confirm_swap;
 
 Map map = {"id":"excbb7dadcd446","amount":0.028,"amountTo":0.21790163,"coinFrom":{"coinCode":"ETH","coinName":"Ethereum","network":"BSC","networkName":"BNB Smart Chain (BEP20)","networkShortName":"BEP20","icon":"https://exolix.com/icons/coins/ETH.png","memoName":""},"coinTo":{"coinCode":"BNB","coinName":"BNB","network":"BSC","networkName":"BNB Smart Chain (BEP20)","networkShortName":"BEP20","icon":"https://exolix.com/icons/coins/BNB.png","memoName":""},"comment":null,"createdAt":"2023-10-26T16:38:18.576Z","depositAddress":"0xF8Aa60E01dd625Ccc9Ce2DEb267ad91c9a8a80ad","depositExtraId":null,"withdrawalAddress":"0x8b8aa19ad5fa4e08980de2285e2038d50844f83a","withdrawalExtraId":null,"refundAddress":null,"refundExtraId":null,"hashIn":{"hash":null,"link":null},"hashOut":{"hash":null,"link":null},"rate":7.78220107,"rateType":"fixed","affiliateToken":null,"status":"wait","email":null};
 
-class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
-
-  BuildContext? _context;
+class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI {
 
   ValueNotifier<ExolixExCoinByNetworkModel> coin1 = ValueNotifier(ExolixExCoinByNetworkModel());
 
   ValueNotifier<ExolixExCoinByNetworkModel> coin2 = ValueNotifier(ExolixExCoinByNetworkModel());
   
-  ValueNotifier<bool> isLstCoinReady = ValueNotifier(false);
+  // ValueNotifier<bool> isLstCoinReady = ValueNotifier(false);
 
   ValueNotifier<String> receiveAmt = ValueNotifier("");
 
+  ValueNotifier<bool> isReady = ValueNotifier(false);
+
   final ExolixExchangeRepoImpl _exolixExchangeRepoImpl = ExolixExchangeRepoImpl();
 
-  List<ExolixExchangeCoin> defaultLstCoins = [];
-
-  Widget? imgConversion;
+  List<Map<String, dynamic>> defaultLstCoins = [];
 
   ExolixSwapModel swapModel = ExolixSwapModel();
 
@@ -31,87 +30,102 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
 
   ValueNotifier<List<ExolixExCoinByNetworkModel>> lstLECoin = ValueNotifier([]);
 
-  List<ExolixSwapResModel>? lstTx;
-  
-  ValueNotifier<bool> isReady = ValueNotifier(false);
+  final SecureStorageImpl _secureStorageImpl = SecureStorageImpl();
 
-  ValueNotifier<bool> statusNotifier = ValueNotifier(false);
+  List<ExolixSwapResModel>? lstTx;
+
+  BuildContext? _context;
+
+  Widget? imgConversion;
 
   int? index;
+  
+  List<ExchangeCoinI> filteredCoins = [];
+
+  @override
+  String? code, coinName, network, networkName, shortName, icon;
+  
+  ExolixExchangeUCImpl();
+  
+  ExolixExchangeUCImpl.mapping({this.code, this.coinName, this.network, this.networkName, this.icon, this.shortName});
+  
+  @override
+  Future<List<ExchangeCoinI>> getCoins() async {
+
+    print("ExolixExchangeUCImpl");
+
+    defaultLstCoins = await _exolixExchangeRepoImpl.getExolixExchangeCoin();
+    
+    for (var element in defaultLstCoins) {
+      
+      filteredCoins.addAll(List<Map<String, dynamic>>.from(element['networks']).map((e) {
+        return ExolixExchangeUCImpl.mapping(
+          code: element['code'], 
+          coinName: element['name'], 
+          icon: element['icon'],
+          network: e['network'],
+          networkName: e['name'],
+          shortName: e['shortName'].toString().isEmpty ? null : e['shortName']
+        );
+        
+      }));
+    }
+    
+    return filteredCoins;
+    
+  }
 
   set setContext(BuildContext ctx){
+    
     _context = ctx;
     _paymentUcImpl.setBuildContext = ctx;
   }
 
-  final SecureStorageImpl _secureStorageImpl = SecureStorageImpl();
-
   @override
-  Future<void> getExolixExchangeCoin() async {
+  Future<List<T>> getExolixExchangeCoin() async {
+
+    defaultLstCoins = await _exolixExchangeRepoImpl.getExolixExchangeCoin();
     
-    if(defaultLstCoins.isEmpty){
-      defaultLstCoins = await _exolixExchangeRepoImpl.getExolixExchangeCoin();
-    }
-
-    if (lstTx == null){
-
-      await _secureStorageImpl.readSecure(DbKey.lstExolicTxIds_key)!.then( (localLstTx){
-
-        lstTx?.clear();
-
-        // ignore: unnecessary_null_comparison
-        if (localLstTx.isNotEmpty){
-
-          lstTx = List<Map<String, dynamic>>.from((json.decode(localLstTx))).map((e) {
-            return ExolixSwapResModel.fromJson(e);
-          }).toList();
-        }
-        
-
-        // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-        isReady.value = true;
-
-      });
-    }
-
     lstCoinExtract();
+
+    return defaultLstCoins as List<T>;
     
   }
   
   void lstCoinExtract() {
 
-    for(int i = 0; i < defaultLstCoins.length; i++){
+    // for(int i = 0; i < defaultLstCoins.length; i++){
 
-      for (int j = 0; j < defaultLstCoins[i].networks!.length; j++){
-        addCoinByIndex(i, j);
-      }
+    //   for (int j = 0; j < defaultLstCoins[i].networks!.length; j++){
+    //     addCoinByIndex(i, j);
+    //   }
 
-    }
+    // }
 
-    isLstCoinReady.value = true;
+    // isLstCoinReady.value = true;
     
   }
 
   void addCoinByIndex(int i, int j) {
 
-    if (
-      defaultLstCoins[i].networks![j].network == "BTC" ||
-      defaultLstCoins[i].networks![j].network == "BSC" ||
-      defaultLstCoins[i].networks![j].network == "ETH"
-    ){
+    // if (
+    //   defaultLstCoins[i].networks![j].network == "BTC" ||
+    //   defaultLstCoins[i].networks![j].network == "BSC" ||
+    //   defaultLstCoins[i].networks![j].network == "ETH"
+    // ){
 
-      lstLECoin.value.add(
-        ExolixExCoinByNetworkModel(
-          title: defaultLstCoins[i].code,
-          subtitle: defaultLstCoins[i].name,
-          image: Container(),//imgConversion!,
-          network: defaultLstCoins[i].networks![j].name!,
-          networkCode: defaultLstCoins[i].networks![j].network,
-          balance: "0"//contractProvider!.sortListContract[i].balance,
+    //   lstLECoin.value.add(
+    //     ExolixExCoinByNetworkModel(
+    //       title: defaultLstCoins[i].code,
+    //       subtitle: defaultLstCoins[i].name,
+    //       image: Container(),//imgConversion!,
+    //       network: defaultLstCoins[i].networks![j].name!,
+    //       networkCode: defaultLstCoins[i].networks![j].network,
+    //       balance: "0"//contractProvider!.sortListContract[i].balance,
           
-        )
-      );
-    }
+    //     )
+    //   );
+    // }
 
   }
 
@@ -159,11 +173,11 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
 
       queryEstimateAmt();
 
-      if (Validator.swapValidator(swapModel.coinFrom!, swapModel.coinTo!, swapModel.amt!.value) == true){
-        isReady.value = true;
-      } else if (isReady.value == true){
-        isReady.value = false;
-      }
+      // if (Validator.swapValidator(swapModel.coinFrom!, swapModel.coinTo!, swapModel.amt!.value) == true){
+      //   isReady.value = true;
+      // } else if (isReady.value == true){
+      //   isReady.value = false;
+      // }
     }
 
   }
@@ -171,6 +185,7 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
   void queryEstimateAmt() {
 
     if (swapModel.coinFrom!.isNotEmpty && swapModel.coinTo!.isNotEmpty){
+
       EasyDebounce.debounce("tag", const Duration(milliseconds: 500), () async {
         await _exolixExchangeRepoImpl.exolixTwoCoinInfo({
           "coinFrom": swapModel.coinFrom,
@@ -191,38 +206,38 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
 
   void setCoin(BuildContext context, bool isFrom){
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => exo_swap_screen.SelectSwapToken(itemLE: lstLECoin.value))
-    ).then((res) {
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => exo_swap_screen.SelectSwapToken(itemLE: lstLECoin.value))
+    // ).then((res) {
 
-      if (res != null){
+    //   if (res != null){
 
-        if (isFrom == true){
+    //     if (isFrom == true){
 
-          coin1.value = lstLECoin.value[res];
-          swapModel.coinFrom = coin1.value.title;
-          swapModel.networkFrom = coin1.value.networkCode;
+    //       coin1.value = lstLECoin.value[res];
+    //       swapModel.coinFrom = coin1.value.title;
+    //       swapModel.networkFrom = coin1.value.networkCode;
 
-        } else {
+    //     } else {
           
-          coin2.value = lstLECoin.value[res];
-          swapModel.coinTo = coin2.value.title;
-          swapModel.networkTo = coin2.value.networkCode;
-        }
+    //       coin2.value = lstLECoin.value[res];
+    //       swapModel.coinTo = coin2.value.title;
+    //       swapModel.networkTo = coin2.value.networkCode;
+    //     }
 
-        swapModel.withdrawalAddress = Provider.of<SDKProvider>(context, listen: false).getSdkImpl.evmAddress;
+    //     swapModel.withdrawalAddress = Provider.of<SDKProvider>(context, listen: false).getSdkImpl.evmAddress;
         
-        queryEstimateAmt();
+    //     queryEstimateAmt();
         
-        if (Validator.swapValidator(swapModel.coinFrom!, swapModel.coinTo!, swapModel.amt!.value) == true){
-          isReady.value = true;
-        } else if (isReady.value == false) {
-          isReady.value = false;
-        }
+    //     // if (Validator.swapValidator(swapModel.coinFrom!, swapModel.coinTo!, swapModel.amt!.value) == true){
+    //     //   isReady.value = true;
+    //     // } else if (isReady.value == false) {
+    //     //   isReady.value = false;
+    //     // }
         
-      }
-    });
+    //   }
+    // });
   }
 
   @override
@@ -310,11 +325,11 @@ class ExolixExchangeUCImpl implements ExolixExchangeUseCases {
   @override
   Future<void> exolixConfirmSwap(int indx) async {
     
-    index = indx;
-    Navigator.push(
-      _context!,
-      MaterialPageRoute(builder: (context) => exo_confirm_swap.ConfirmSwapExchange(statusNotifier: statusNotifier, swapResModel: lstTx?[indx], confirmSwap: exolixSwapping, getStatus: getStatus))
-    );
+    // index = indx;
+    // Navigator.push(
+    //   _context!,
+    //   MaterialPageRoute(builder: (context) => exo_confirm_swap.ConfirmSwapExchange(statusNotifier: statusNotifier, swapResModel: lstTx?[indx], confirmSwap: exolixSwapping, getStatus: getStatus))
+    // );
   }
 
   @override

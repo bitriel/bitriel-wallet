@@ -1,6 +1,6 @@
 import 'package:bitriel_wallet/domain/usecases/home_uc/home.uc.impl.dart';
 import 'package:bitriel_wallet/index.dart';
-import 'package:bitriel_wallet/presentation/screen/swap_exolix_ex/swap_ex_screen.dart';
+import 'package:bitriel_wallet/presentation/screen/exchange/swap_exolix_ex/swap_ex_screen.dart';
 
 class HomeScreen extends StatelessWidget {
 

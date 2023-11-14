@@ -97,7 +97,7 @@ export 'package:bitriel_wallet/domain/model/new_acc_m.dart';
 export 'package:bitriel_wallet/domain/model/smart_contract_m.dart';
 export 'package:bitriel_wallet/domain/model/line_chart_model.dart';
 export 'package:bitriel_wallet/domain/model/market.m.dart';
-export 'package:bitriel_wallet/domain/model/lets_ex_coin_m.dart';
+export 'package:bitriel_wallet/domain/model/exchange.model/lets_ex_coin_m.dart';
 export 'package:bitriel_wallet/domain/model/swap_m.dart';
 export 'package:bitriel_wallet/domain/model/coin_info_m.dart';
 
@@ -150,16 +150,16 @@ export 'package:bitriel_wallet/presentation/screen/setting_screen.dart';
 export 'package:bitriel_wallet/presentation/screen/wallet/wallet_screen.dart';
 export 'package:bitriel_wallet/presentation/screen/token_info_screen.dart';
 export 'package:bitriel_wallet/presentation/screen/wallet/add_asset_screen.dart';
-export 'package:bitriel_wallet/presentation/screen/swap_lets_ex/swap_ex_screen.dart';
+export 'package:bitriel_wallet/presentation/screen/exchange/swap_lets_ex/swap_ex_screen.dart';
 export 'package:bitriel_wallet/presentation/screen/wallet/payment/payment_screen.dart';
 export 'package:bitriel_wallet/presentation/screen/wallet/receive_screen.dart';
 export 'package:bitriel_wallet/presentation/screen/wallet/transaction_detail_screen.dart';
-export 'package:bitriel_wallet/presentation/screen/swap_lets_ex/select_swap_token_screen.dart';
+export 'package:bitriel_wallet/presentation/screen/exchange/swap_lets_ex/select_swap_token_screen.dart';
 export 'package:bitriel_wallet/presentation/screen/about_screen.dart';
 export 'package:bitriel_wallet/presentation/screen/privacy_screen.dart';
-export 'package:bitriel_wallet/presentation/screen/swap_lets_ex/lst_letsexchange_tx.exchange.dart';
+export 'package:bitriel_wallet/presentation/screen/exchange/swap_lets_ex/lst_letsexchange_tx.exchange.dart';
 export 'package:bitriel_wallet/presentation/screen/account/backup_wallet_screen.dart';
-export 'package:bitriel_wallet/presentation/screen/swap_lets_ex/confirm_swap_ex.dart';
+export 'package:bitriel_wallet/presentation/screen/exchange/swap_lets_ex/confirm_swap_ex.dart';
 export 'package:bitriel_wallet/presentation/screen/qr_scanner/qr_scanner_screen.dart';
 
 // Widget
@@ -180,7 +180,7 @@ export 'package:bitriel_wallet/presentation/widget/shimmer_market_widget.dart';
 export 'package:bitriel_wallet/presentation/widget/dropdown_widget.dart';
 export 'package:bitriel_wallet/presentation/widget/swap_numpad_c.dart';
 export 'package:bitriel_wallet/presentation/screen/main_screen.dart';
-export 'package:bitriel_wallet/presentation/screen/swap_exolix_ex/swap_ex_screen.dart';
+export 'package:bitriel_wallet/presentation/screen/exchange/swap_exolix_ex/swap_ex_screen.dart';
 
 // Provider
 export 'package:bitriel_wallet/presentation/provider/asset_pro.dart';

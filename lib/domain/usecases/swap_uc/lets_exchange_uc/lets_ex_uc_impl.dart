@@ -1,6 +1,7 @@
+import 'package:bitriel_wallet/domain/usecases/swap_uc/exchange.i.dart';
 import 'package:bitriel_wallet/index.dart';
 
-class LetsExchangeUCImpl implements LetsExchangeUseCases {
+class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI {
 
   BuildContext? _context;
   
@@ -15,11 +16,9 @@ class LetsExchangeUCImpl implements LetsExchangeUseCases {
 
   final LetsExchangeRepoImpl _letsExchangeRepoImpl = LetsExchangeRepoImpl();
 
-  List<LetsExchangeCoin> defaultLstCoins = [];
+  List<Map<String, dynamic>> defaultLstCoins = [];
 
   Widget? imgConversion;
-
-  SwapModel swapModel = SwapModel();
 
   final PaymentUcImpl _paymentUcImpl = PaymentUcImpl();
 
@@ -28,6 +27,8 @@ class LetsExchangeUCImpl implements LetsExchangeUseCases {
   List<SwapResModel>? lstTx;
   
   ValueNotifier<bool> statusNotifier = ValueNotifier(false);
+
+  List<ExchangeCoinI> filteredCoins = [];
 
   int? index;
 
@@ -40,56 +41,115 @@ class LetsExchangeUCImpl implements LetsExchangeUseCases {
 
   final SecureStorageImpl _secureStorageImpl = SecureStorageImpl();
 
+  SwapModel swapModel = SwapModel();
   @override
-  Future<void> getLetsExchangeCoin() async {
+  String? code, coinName, network, networkName, shortName, icon;
+  
+  LetsExchangeUCImpl();
+  
+  LetsExchangeUCImpl.mapping({this.code, this.coinName, this.network, this.networkName, this.icon, this.shortName});
+
+  @override
+  Future<List<ExchangeCoinI>> getCoins() async {
     
-    if(defaultLstCoins.isEmpty){
-      defaultLstCoins = await _letsExchangeRepoImpl.getLetsExchangeCoin();
-    }
+    defaultLstCoins = await _letsExchangeRepoImpl.getLetsExchangeCoin();
+    
+    print("defaultLstCoins $defaultLstCoins");
 
-    if (lstTx == null){
-      _secureStorageImpl.readSecure(DbKey.lstTxIds)!.then( (localLstTx){
+    for (var element in defaultLstCoins) {
 
-        lstTx = [];
+      filteredCoins.addAll(
+        List<Map<String, dynamic>>.from(element['networks']).map((e) {
+          return LetsExchangeUCImpl.mapping(
+            code: element['code'], 
+            coinName: element['name'], 
+            icon: element['icon'],
+            network: e['code'],
+            networkName: e['name'],
+            shortName: e['code']
+          );
+        })
+      );
+      
+      // List<Map<String, dynamic>>.from(element['networks']).every((e) {
+
+      //   code = element['code'];
+      //   coinName = element['name'];
+      //   icon = element['icon'];
+      //   network = e['network'];
+      //   networkName = e['name'];
+
+      //   filteredCoins.add(this);
+
+      //   return true;
         
-        print("localLstTx $localLstTx");
-
-        // ignore: unnecessary_null_comparison
-        if (localLstTx.isNotEmpty){
-
-          lstTx = List<Map<String, dynamic>>.from((json.decode(localLstTx))).map((e) {
-            return SwapResModel.fromJson(e);
-          }).toList();
-          
-        }
-
-        // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-        isReady.value = true;
-
-      });
+      // });
     }
+
+    for (var element in filteredCoins) {
+      print("Element ${element.coinName}");
+    }
+
+    return filteredCoins;
+
+  }
+
+  @override
+  Future<List<T>> getLetsExchangeCoin() async {
+
+    defaultLstCoins = await _letsExchangeRepoImpl.getLetsExchangeCoin();
 
     lstCoinExtract();
+
+    return defaultLstCoins as List<T>;
+    
+    // if(defaultLstCoins.isEmpty){
+    //   defaultLstCoins = await _letsExchangeRepoImpl.getLetsExchangeCoin();
+    // }
+
+    // if (lstTx == null){
+    //   _secureStorageImpl.readSecure(DbKey.lstTxIds)!.then( (localLstTx){
+
+    //     lstTx = [];
+        
+    //     print("localLstTx $localLstTx");
+
+    //     // ignore: unnecessary_null_comparison
+    //     if (localLstTx.isNotEmpty){
+
+    //       lstTx = List<Map<String, dynamic>>.from((json.decode(localLstTx))).map((e) {
+    //         return SwapResModel.fromJson(e);
+    //       }).toList();
+          
+    //     }
+
+    //     // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
+    //     isReady.value = true;
+
+    //   });
+    // }
+
+    // lstCoinExtract();
     
   }
   
   void lstCoinExtract() {
 
-    for(int i = 0; i < defaultLstCoins.length; i++){
+    // for(int i = 0; i < defaultLstCoins.length; i++){
 
-      for (int j = 0; j < defaultLstCoins[i].networks!.length; j++){
-        addCoinByIndex(i, j);
-      }
+    //   for (int j = 0; j < defaultLstCoins[i].networks!.length; j++){
+    //     addCoinByIndex(i, j);
+    //   }
 
-    }
+    // }
 
-    isLstCoinReady.value = true;
+    // isLstCoinReady.value = true;
     
   }
 
   void addCoinByIndex(int i, int j) {
 
-    if (defaultLstCoins[i].icon != null){
+    if (defaultLstCoins[i]['icon'] != null){
 
     //   if (lstCoins![i]['icon'].contains('svg')){
     //     imgConversion = SvgPicture.network(lstCoins![i]['icon'], width: 10);
@@ -103,25 +163,27 @@ class LetsExchangeUCImpl implements LetsExchangeUseCases {
     }
 
     if (
-      defaultLstCoins[i].networks![j].code == "BTC" ||
-      defaultLstCoins[i].networks![j].code == "BEP20" ||
-      defaultLstCoins[i].networks![j].code == "ERC20" ||
-      defaultLstCoins[i].networks![j].code == "Ethereum" ||
-      defaultLstCoins[i].networks![j].code == "Binance Chain"
+      defaultLstCoins[i]['network']![j].code == "BTC" ||
+      defaultLstCoins[i]['network']![j].code == "BEP20" ||
+      defaultLstCoins[i]['network']![j].code == "ERC20" ||
+      defaultLstCoins[i]['network']![j].code == "Ethereum" ||
+      defaultLstCoins[i]['network']![j].code == "Binance Chain"
     ){
+      
+      // ExolixExchangeUCImpl.mapping({this.code, this.coinName, this.network, this.networkName, this.icon, this.shortName});
 
-      lstLECoin.value.add(
-        LetsExCoinByNetworkModel(
-          title: defaultLstCoins[i].code,
-          subtitle: defaultLstCoins[i].name,
-          // isActive: index2 == i ? true : false,
-          image: Container(),//imgConversion!,
-          network: defaultLstCoins[i].networks![j].name!,
-          networkCode: defaultLstCoins[i].networks![j].code,
-          balance: "0"//contractProvider!.sortListContract[i].balance,
+      // lstLECoin.value.add(
+      //   LetsExCoinByNetworkModel(
+      //     title: defaultLstCoins[i]['code'],
+      //     subtitle: defaultLstCoins[i]['name'],
+      //     // isActive: index2 == i ? true : false,
+      //     image: Container(),//imgConversion!,
+      //     network: defaultLstCoins[i]['network'][j].name!,
+      //     networkCode: defaultLstCoins[i]['network'][j].code,
+      //     balance: "0"//contractProvider!.sortListContract[i].balance,
           
-        )
-      );
+      //   )
+      // );
     }
 
   }
@@ -130,13 +192,13 @@ class LetsExchangeUCImpl implements LetsExchangeUseCases {
   @override 
   void onDeleteTxt() {
 
-    final formattedValue = formatCurrencyText(swapModel.amt!.value);
+    // final formattedValue = formatCurrencyText(swapModel.amt!.value);
 
-    swapModel.amt!.value = formattedValue;
+    // swapModel.amt!.value = formattedValue;
 
-    if (swapModel.amt!.value.isNotEmpty) {
-      swapModel.amt!.value = swapModel.amt!.value.substring(0, swapModel.amt!.value.length - 1);
-    }
+    // if (swapModel.amt!.value.isNotEmpty) {
+    //   swapModel.amt!.value = swapModel.amt!.value.substring(0, swapModel.amt!.value.length - 1);
+    // }
 
   }
 
@@ -147,153 +209,153 @@ class LetsExchangeUCImpl implements LetsExchangeUseCases {
   @override
   void formatDouble(String value) {
 
-    if (swapModel.amt!.value.replaceAll(".", "").length < 10){
-      // Value Equal Empty & Not Contains "."
-      if (value.contains(".") && !(swapModel.amt!.value.contains(".")) && swapModel.amt!.value.isEmpty){
+    // if (swapModel.amt!.value.replaceAll(".", "").length < 10){
+    //   // Value Equal Empty & Not Contains "."
+    //   if (value.contains(".") && !(swapModel.amt!.value.contains(".")) && swapModel.amt!.value.isEmpty){
 
-        swapModel.amt!.value = "0.";
+    //     swapModel.amt!.value = "0.";
 
-      } 
-      // Prevent Add "." Multiple Time.
-      // Reject Input "." Evertime
-      else if ( !(value.contains("."))) {
+    //   } 
+    //   // Prevent Add "." Multiple Time.
+    //   // Reject Input "." Evertime
+    //   else if ( !(value.contains("."))) {
 
-        swapModel.amt!.value = swapModel.amt!.value + value;
+    //     swapModel.amt!.value = swapModel.amt!.value + value;
 
-      }
-      // Add "." For Only one time.
-      else if ( !(swapModel.amt!.value.contains(".")) ){
+    //   }
+    //   // Add "." For Only one time.
+    //   else if ( !(swapModel.amt!.value.contains(".")) ){
 
-        swapModel.amt!.value = swapModel.amt!.value + value;
+    //     swapModel.amt!.value = swapModel.amt!.value + value;
       
-      }
+    //   }
 
-      queryEstimateAmt();
+    //   queryEstimateAmt();
 
-      if (Validator.swapValidator(swapModel.from!, swapModel.to!, swapModel.amt!.value) == true){
-        isReady.value = true;
-      } else if (isReady.value == true){
-      isReady.value = false;
-      }
-    }
+    //   if (Validator.swapValidator(swapModel.from!, swapModel.to!, swapModel.amt!.value) == true){
+    //     isReady.value = true;
+    //   } else if (isReady.value == true){
+    //   isReady.value = false;
+    //   }
+    // }
 
   }
 
   void queryEstimateAmt() {
 
-    if (swapModel.from!.isNotEmpty && swapModel.to!.isNotEmpty){
-      EasyDebounce.debounce("tag", const Duration(milliseconds: 500), () async {
-        await _letsExchangeRepoImpl.twoCoinInfo({
-          "from": swapModel.from,
-          "to": swapModel.to,
-          "network_from": swapModel.networkFrom,
-          "network_to": swapModel.networkTo,
-          "amount": swapModel.amt!.value
-        }).then((value) {
+    // if (swapModel.from!.isNotEmpty && swapModel.to!.isNotEmpty){
+    //   EasyDebounce.debounce("tag", const Duration(milliseconds: 500), () async {
+    //     await _letsExchangeRepoImpl.twoCoinInfo({
+    //       "from": swapModel.from,
+    //       "to": swapModel.to,
+    //       "network_from": swapModel.networkFrom,
+    //       "network_to": swapModel.networkTo,
+    //       "amount": swapModel.amt!.value
+    //     }).then((value) {
 
-          if (value.statusCode == 200) {
-            receiveAmt.value = (json.decode(value.body))['amount'].toString();
-          }
-        });
-      });
-    }
+    //       if (value.statusCode == 200) {
+    //         receiveAmt.value = (json.decode(value.body))['amount'].toString();
+    //       }
+    //     });
+    //   });
+    // }
   }
 
   void setCoin(BuildContext context, bool isFrom){
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => SelectSwapToken(itemLE: lstLECoin.value))
-    ).then((res) {
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => SelectSwapToken(itemLE: lstLECoin.value))
+    // ).then((res) {
 
-      if (res != null){
+    //   if (res != null){
 
-        if (isFrom == true){
+    //     if (isFrom == true){
 
-          coin1.value = lstLECoin.value[res];
-          swapModel.from = coin1.value.title;
-          swapModel.networkFrom = coin1.value.networkCode;
+    //       coin1.value = lstLECoin.value[res];
+    //       swapModel.from = coin1.value.title;
+    //       swapModel.networkFrom = coin1.value.networkCode;
 
-        } else {
+    //     } else {
           
-          coin2.value = lstLECoin.value[res];
-          swapModel.to = coin2.value.title;
-          swapModel.networkTo = coin2.value.networkCode;
-        }
+    //       coin2.value = lstLECoin.value[res];
+    //       swapModel.to = coin2.value.title;
+    //       swapModel.networkTo = coin2.value.networkCode;
+    //     }
 
-        swapModel.withdrawal = Provider.of<SDKProvider>(context, listen: false).getSdkImpl.evmAddress;
+    //     swapModel.withdrawal = Provider.of<SDKProvider>(context, listen: false).getSdkImpl.evmAddress;
         
-        queryEstimateAmt();
+    //     queryEstimateAmt();
         
-        if (Validator.swapValidator(swapModel.from!, swapModel.to!, swapModel.amt!.value) == true){
-          isReady.value = true;
-        } else if (isReady.value == false) {
-          isReady.value = false;
-        }
+    //     if (Validator.swapValidator(swapModel.from!, swapModel.to!, swapModel.amt!.value) == true){
+    //       isReady.value = true;
+    //     } else if (isReady.value == false) {
+    //       isReady.value = false;
+    //     }
         
-      }
-    });
+    //   }
+    // });
   }
 
   @override
   Future<void> swap() async {
     
-    try {
+    // try {
 
-      dialogLoading(_context!);
+    //   dialogLoading(_context!);
 
-      await _letsExchangeRepoImpl.swap(swapModel.toJson()).then((value) async {
+    //   await _letsExchangeRepoImpl.swap(swapModel.toJson()).then((value) async {
         
-        if (value.statusCode == 401){
-          throw json.decode(value.body)['error'];
-        }
-        // Unprocessable entity
-        else if (value.statusCode == 422) {
-          throw (json.decode(value.body)['error']['validation'].containsKey("coin_from") 
-            ? "The selected first coin is not active." 
-            : "The selected second coin is not active." 
-          );
-        }
+    //     if (value.statusCode == 401){
+    //       throw json.decode(value.body)['error'];
+    //     }
+    //     // Unprocessable entity
+    //     else if (value.statusCode == 422) {
+    //       throw (json.decode(value.body)['error']['validation'].containsKey("coin_from") 
+    //         ? "The selected first coin is not active." 
+    //         : "The selected second coin is not active." 
+    //       );
+    //     }
 
-        else if (value.statusCode == 200) {
+    //     else if (value.statusCode == 200) {
 
-          lstTx!.add(SwapResModel.fromJson(json.decode(value.body)));
+    //       lstTx!.add(SwapResModel.fromJson(json.decode(value.body)));
           
-          await SecureStorageImpl().writeSecure(DbKey.lstTxIds, json.encode(SwapResModel().toJson(lstTx!)));
+    //       await SecureStorageImpl().writeSecure(DbKey.lstTxIds, json.encode(SwapResModel().toJson(lstTx!)));
 
-          // Close Dialog
-          Navigator.pop(_context!);
+    //       // Close Dialog
+    //       Navigator.pop(_context!);
 
-          await QuickAlert.show(
-            context: _context!,
-            type: QuickAlertType.success,
-            showCancelBtn: true,
-            cancelBtnText: "Close",
-            cancelBtnTextStyle: TextStyle(fontSize: 14, color: hexaCodeToColor(AppColors.primaryBtn)),
-            confirmBtnText: "Confirm",
-            text: 'Swap Successfully!',
-            onConfirmBtnTap: () {
-              confirmSwap(lstTx!.length - 1);
-            },
-          );
-        } else {
-          throw json.decode(value.body);
-        }
-      });
+    //       await QuickAlert.show(
+    //         context: _context!,
+    //         type: QuickAlertType.success,
+    //         showCancelBtn: true,
+    //         cancelBtnText: "Close",
+    //         cancelBtnTextStyle: TextStyle(fontSize: 14, color: hexaCodeToColor(AppColors.primaryBtn)),
+    //         confirmBtnText: "Confirm",
+    //         text: 'Swap Successfully!',
+    //         onConfirmBtnTap: () {
+    //           confirmSwap(lstTx!.length - 1);
+    //         },
+    //       );
+    //     } else {
+    //       throw json.decode(value.body);
+    //     }
+    //   });
 
-    } catch (e) {
+    // } catch (e) {
 
-      print(e);
+    //   print(e);
 
-      // Close Dialog
-      Navigator.pop(_context!);
+    //   // Close Dialog
+    //   Navigator.pop(_context!);
       
-      await QuickAlert.show(
-        context: _context!,
-        type: QuickAlertType.error,
-        text: '$e',
-      );
-    }
+    //   await QuickAlert.show(
+    //     context: _context!,
+    //     type: QuickAlertType.error,
+    //     text: '$e',
+    //   );
+    // }
   }
 
   // Index Of List

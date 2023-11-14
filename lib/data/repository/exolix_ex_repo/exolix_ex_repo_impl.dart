@@ -1,29 +1,30 @@
 import 'package:bitriel_wallet/data/api/post_api.dart';
 import 'package:bitriel_wallet/data/repository/exolix_ex_repo/exolix_ex_repo.dart';
-import 'package:bitriel_wallet/domain/model/exolix_ex_coin_m.dart';
 import 'package:bitriel_wallet/index.dart';
 
 class ExolixExchangeRepoImpl implements ExolixExchangeRepository {
 
-  List<ExolixExchangeCoin> lstExoCoin = [];
+  // List<ExolixExchangeCoin> lstExoCoin = [];
 
   @override
-  Future<List<ExolixExchangeCoin>> getExolixExchangeCoin() async {
+  Future<List<Map<String, dynamic>>> getExolixExchangeCoin() async {
     
-    await GetRequest.getExolixExchangeCoin().then((value) {
+    // print(jsonDecode((await GetRequest.getExolixExchangeCoin()).body)['data']);
+    return List<Map<String, dynamic>>.from(jsonDecode((await GetRequest.getExolixExchangeCoin()).body)['data']);
+    // .then((value) {
 
-      if (value.statusCode == 200) {
+    //   if (value.statusCode == 200) {
 
-        List<dynamic> json = jsonDecode(value.body)['data'];
+    //     List<dynamic> json = jsonDecode(value.body)['data'];
 
-        for (dynamic jsonExoCoin in json){
+    //     // for (dynamic jsonExoCoin in json){
           
-          lstExoCoin.add(ExolixExchangeCoin.fromJson(jsonExoCoin));
-        }
-      }
-    });
+    //     //   lstExoCoin.add(ExolixExchangeCoin.fromJson(jsonExoCoin));
+    //     // }
+    //   }
+    // });
 
-    return lstExoCoin;
+    // return lstExoCoin;
 
   }
 
