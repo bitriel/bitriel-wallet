@@ -263,7 +263,10 @@ class SwapExolicExchange extends StatelessWidget {
                                   margin: const EdgeInsets.symmetric(horizontal: 10),
                                   height: 40, 
                                   width: 40, 
-                                  child: ClipRRect(borderRadius: BorderRadius.circular(50), child: Image.network(leUCImpl.coin1!.icon!)) //_buildImageItem(index),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(50), 
+                                    child: leUCImpl.coin1!.icon!.contains('.svg') ? SvgPicture.network(leUCImpl.coin1!.icon!) : Image.network(leUCImpl.coin1!.icon!)
+                                  ) //_buildImageItem(index),
                                 ),
 
                                 Column(
@@ -419,7 +422,10 @@ class SwapExolicExchange extends StatelessWidget {
                                   margin: const EdgeInsets.symmetric(horizontal: 10),
                                   height: 40, 
                                   width: 40, 
-                                  child: ClipRRect(borderRadius: BorderRadius.circular(50), child: Image.network(leUCImpl.coin2!.icon!)) //_buildImageItem(index),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(50), 
+                                    child: leUCImpl.coin2!.icon!.contains('.svg') ? SvgPicture.network(leUCImpl.coin2!.icon!) : Image.network(leUCImpl.coin2!.icon!)
+                                  ) //_buildImageItem(index),
                                 ),
 
                                 Column(
@@ -450,32 +456,7 @@ class SwapExolicExchange extends StatelessWidget {
                             );
                           }
                         )
-                        // ValueListenableBuilder(
-                        //   valueListenable: leUCImpl.coin2,
-                        //   builder: (context, coin2, wg) {
-                        //     return Row(
-                        //       children: [
-                        //         MyTextConstant(
-                        //           text: coin2.title ?? 'Select Token',
-                        //           color2: coin2.title == null ? hexaCodeToColor(AppColors.grey) : hexaCodeToColor(AppColors.midNightBlue),
-                        //           fontWeight: coin2.title == null ? FontWeight.normal : FontWeight.bold,
-                        //         ),
 
-                        //         coin2.networkCode != null ? MyTextConstant(
-                        //           text: " (${coin2.networkCode})",
-                        //           color2: coin2.networkCode == null ? hexaCodeToColor(AppColors.grey) : hexaCodeToColor(AppColors.midNightBlue),
-                        //           overflow: TextOverflow.ellipsis,
-                        //         ) : const SizedBox(),
-
-                        //         const Spacer(),
-
-                        //         Icon(Iconsax.arrow_down_1, color: hexaCodeToColor(AppColors.orangeColor),),
-
-                        //         const SizedBox(width: 10),
-                        //       ],
-                        //     );
-                        //   }
-                        // ),
                       ),
                     ),
                   );

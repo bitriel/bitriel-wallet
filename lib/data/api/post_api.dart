@@ -75,6 +75,8 @@ class PostRequest {
 
   Future<http.Response> twoCoinInfo(Map<String, dynamic> mapData) async {
 
+    print("mapData $mapData");
+
     _api ??= dotenv.get('LETS_EXCHANGE_API');
     var token = dotenv.get('LETS_EXCHANGE_TOKEN');
 

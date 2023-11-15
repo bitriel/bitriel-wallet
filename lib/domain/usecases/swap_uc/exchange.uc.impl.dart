@@ -42,8 +42,8 @@ class ExchangeUcImpl<T> {
   void initExchangeState() async {
     
     exchanges = [
-      Exchange(title: 'Exolix', getCoins: exolicUCImpl.getCoins),
-      Exchange(title: 'LetsExchange', getCoins: letsExchangeUCImpl.getCoins) 
+      Exchange(title: 'Exolix', getCoins: exolicUCImpl.getCoins, rate: exolicUCImpl.rate),
+      Exchange(title: 'LetsExchange', getCoins: letsExchangeUCImpl.getCoins, rate: letsExchangeUCImpl.rate) 
     ];
 
     isExchangeStateReady.value = true;
@@ -103,11 +103,11 @@ class ExchangeUcImpl<T> {
 
     if (receiveingAmt.value == false) receiveingAmt.value = true;
 
-    EasyDebounce.debounce("queryEstimateAmt", const Duration(milliseconds: 500), () async {
+    EasyDebounce.debounce("queryEstimateAmt", const Duration(milliseconds: 800), () async {
 
       if (coin1 != null && coin2 != null){
 
-        receivedAmt = (await exolicUCImpl.rate(coin1!, coin2!, swapModel))['toAmount'].toString();
+        receivedAmt = (await exchanges![currentIndex.value].rate(coin1!, coin2!, swapModel)).toString();
 
         receiveingAmt.value = false;
         // EasyDebounce.debounce("queryEstimateAmt", const Duration(milliseconds: 500), () async {

@@ -53,48 +53,48 @@ class SwapExchange extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
 
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(10))
-                ),
-                child: ValueListenableBuilder(
-                  valueListenable: letsExchangeUCImpl.swapModel.amt!,
-                  builder: (context, value, wg) {
-                    return Column(
-                      children: [
+            // Padding(
+            //   padding: const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),
+            //   child: Container(
+            //     decoration: const BoxDecoration(
+            //       color: Colors.white,
+            //       borderRadius: BorderRadius.all(Radius.circular(10))
+            //     ),
+            //     child: ValueListenableBuilder(
+            //       valueListenable: letsExchangeUCImpl.swapModel.amt!,
+            //       builder: (context, value, wg) {
+            //         return Column(
+            //           children: [
 
-                        _payInput(context, letsExchangeUCImpl),
+            //             _payInput(context, letsExchangeUCImpl),
 
-                        const SizedBox(height: 10),
+            //             const SizedBox(height: 10),
 
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: IconButton(
-                            onPressed: (){
+            //             Align(
+            //               alignment: Alignment.centerRight,
+            //               child: IconButton(
+            //                 onPressed: (){
                               
-                            },
-                            icon: Icon(Iconsax.refresh_circle, size: 35, color: hexaCodeToColor(AppColors.orangeColor),)
-                          ),
-                        ),
+            //                 },
+            //                 icon: Icon(Iconsax.refresh_circle, size: 35, color: hexaCodeToColor(AppColors.orangeColor),)
+            //               ),
+            //             ),
                       
-                        _getDisplay(context, letsExchangeUCImpl),
-                      ],
-                    );
-                  }
-                ),
-              ),
-            ),
+            //             _getDisplay(context, letsExchangeUCImpl),
+            //           ],
+            //         );
+            //       }
+            //     ),
+            //   ),
+            // ),
 
             Expanded(
               child: Container()
             ),
 
-            Center(
-              child: _buildNumberPad(context, letsExchangeUCImpl.swapModel.amt!.value, letsExchangeUCImpl.onDeleteTxt, letsExchangeUCImpl.formatDouble)
-            ),
+            // Center(
+            //   child: _buildNumberPad(context, letsExchangeUCImpl.swapModel.amt!.value, letsExchangeUCImpl.onDeleteTxt, letsExchangeUCImpl.formatDouble)
+            // ),
 
             ValueListenableBuilder(
               valueListenable: letsExchangeUCImpl.isReady,
@@ -144,23 +144,23 @@ class SwapExchange extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width / 2.50,
-                    child: Container(
-                      width: MediaQuery.of(context).size.width / 2.50,
-                      padding: const EdgeInsets.only(top: paddingSize, left: paddingSize / 2, bottom: paddingSize),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50.0),
-                        color: hexaCodeToColor(AppColors.background)
-                      ),
-                      child: MyTextConstant(
-                        textAlign: TextAlign.start,
-                        text: leUCImpl.swapModel.amt!.value.isEmpty ? "0.00" : leUCImpl.swapModel.amt!.value.toString(),
-                        fontSize: 20,
-                        color2: leUCImpl.swapModel.amt!.value.isEmpty ? hexaCodeToColor(AppColors.grey) : hexaCodeToColor(AppColors.midNightBlue),
-                      ),
-                    ),
-                  ),
+                  // SizedBox(
+                  //   width: MediaQuery.of(context).size.width / 2.50,
+                  //   child: Container(
+                  //     width: MediaQuery.of(context).size.width / 2.50,
+                  //     padding: const EdgeInsets.only(top: paddingSize, left: paddingSize / 2, bottom: paddingSize),
+                  //     decoration: BoxDecoration(
+                  //       borderRadius: BorderRadius.circular(50.0),
+                  //       color: hexaCodeToColor(AppColors.background)
+                  //     ),
+                  //     child: MyTextConstant(
+                  //       textAlign: TextAlign.start,
+                  //       text: leUCImpl.swapModel.amt!.value.isEmpty ? "0.00" : leUCImpl.swapModel.amt!.value.toString(),
+                  //       fontSize: 20,
+                  //       color2: leUCImpl.swapModel.amt!.value.isEmpty ? hexaCodeToColor(AppColors.grey) : hexaCodeToColor(AppColors.midNightBlue),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
 
@@ -190,11 +190,11 @@ class SwapExchange extends StatelessWidget {
                   : InkWell(
                     onTap: (){
                       
-                      if (kDebugMode) {
-                        // ignore: unnecessary_null_comparison
-                        print(isLstCoinReady == null);
-                      }
-                      if (isLstCoinReady == true) leUCImpl.setCoin(context, true);
+                      // if (kDebugMode) {
+                      //   // ignore: unnecessary_null_comparison
+                      //   print(isLstCoinReady == null);
+                      // }
+                      // if (isLstCoinReady == true) leUCImpl.setCoin(context, true);
                     },
                     child: SizedBox(
                       width: MediaQuery.of(context).size.width / 2.20,
@@ -326,10 +326,10 @@ class SwapExchange extends StatelessWidget {
                   : InkWell(
                     onTap: (){
 
-                      if (isLstCoinReady == true){
+                      // if (isLstCoinReady == true){
 
-                        leUCImpl.setCoin(context, false);
-                      }
+                      //   leUCImpl.setCoin(context, false);
+                      // }
                     },
                     child: SizedBox(
                       width: MediaQuery.of(context).size.width / 2.20,

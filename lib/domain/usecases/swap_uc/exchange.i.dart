@@ -22,6 +22,6 @@ abstract class ExchangeCoinI {
   
   Future<List<ExchangeCoinI>> getCoins();
 
-  Future<Map<String, dynamic>> rate(ExchangeCoinI coin1, ExchangeCoinI coin2, SwapModel swapModel);
+  Future<String> rate(ExchangeCoinI coin1, ExchangeCoinI coin2, SwapModel swapModel);
 
 }

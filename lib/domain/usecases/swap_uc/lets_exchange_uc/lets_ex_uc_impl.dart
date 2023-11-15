@@ -41,7 +41,7 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI {
 
   final SecureStorageImpl _secureStorageImpl = SecureStorageImpl();
 
-  SwapModel swapModel = SwapModel();
+  // SwapModel swapModel = SwapModel();
   @override
   String? code, coinName, network, networkName, shortName, icon;
   
@@ -103,34 +103,6 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI {
 
     return defaultLstCoins as List<T>;
     
-    // if(defaultLstCoins.isEmpty){
-    //   defaultLstCoins = await _letsExchangeRepoImpl.getLetsExchangeCoin();
-    // }
-
-    // if (lstTx == null){
-    //   _secureStorageImpl.readSecure(DbKey.lstTxIds)!.then( (localLstTx){
-
-    //     lstTx = [];
-        
-    //     print("localLstTx $localLstTx");
-
-    //     // ignore: unnecessary_null_comparison
-    //     if (localLstTx.isNotEmpty){
-
-    //       lstTx = List<Map<String, dynamic>>.from((json.decode(localLstTx))).map((e) {
-    //         return SwapResModel.fromJson(e);
-    //       }).toList();
-          
-    //     }
-
-    //     // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-    //     isReady.value = true;
-
-    //   });
-    // }
-
-    // lstCoinExtract();
-    
   }
   
   void lstCoinExtract() {
@@ -188,115 +160,25 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI {
 
   }
 
-
-  @override 
-  void onDeleteTxt() {
-
-    // final formattedValue = formatCurrencyText(swapModel.amt!.value);
-
-    // swapModel.amt!.value = formattedValue;
-
-    // if (swapModel.amt!.value.isNotEmpty) {
-    //   swapModel.amt!.value = swapModel.amt!.value.substring(0, swapModel.amt!.value.length - 1);
-    // }
-
-  }
-
-  String formatCurrencyText(String value) {
-    return value;
-  }
-
   @override
-  void formatDouble(String value) {
+  Future<String> rate(ExchangeCoinI coin1, ExchangeCoinI coin2, SwapModel swapModel) async {
 
-    // if (swapModel.amt!.value.replaceAll(".", "").length < 10){
-    //   // Value Equal Empty & Not Contains "."
-    //   if (value.contains(".") && !(swapModel.amt!.value.contains(".")) && swapModel.amt!.value.isEmpty){
-
-    //     swapModel.amt!.value = "0.";
-
-    //   } 
-    //   // Prevent Add "." Multiple Time.
-    //   // Reject Input "." Evertime
-    //   else if ( !(value.contains("."))) {
-
-    //     swapModel.amt!.value = swapModel.amt!.value + value;
-
-    //   }
-    //   // Add "." For Only one time.
-    //   else if ( !(swapModel.amt!.value.contains(".")) ){
-
-    //     swapModel.amt!.value = swapModel.amt!.value + value;
-      
-    //   }
-
-    //   queryEstimateAmt();
-
-    //   if (Validator.swapValidator(swapModel.from!, swapModel.to!, swapModel.amt!.value) == true){
-    //     isReady.value = true;
-    //   } else if (isReady.value == true){
-    //   isReady.value = false;
-    //   }
-    // }
-
-  }
-
-  @override
-  Future<Map<String, dynamic>> rate(ExchangeCoinI coin1, ExchangeCoinI coin2, SwapModel swapModel) {
-
-    // if (swapModel.from!.isNotEmpty && swapModel.to!.isNotEmpty){
-    //   EasyDebounce.debounce("tag", const Duration(milliseconds: 500), () async {
-    //     await _letsExchangeRepoImpl.twoCoinInfo({
-    //       "from": swapModel.from,
-    //       "to": swapModel.to,
-    //       "network_from": swapModel.networkFrom,
-    //       "network_to": swapModel.networkTo,
-    //       "amount": swapModel.amt!.value
-    //     }).then((value) {
-
-    //       if (value.statusCode == 200) {
-    //         receiveAmt.value = (json.decode(value.body))['amount'].toString();
-    //       }
-    //     });
-    //   });
-    // }
-    return Future.delayed(const Duration(seconds: 2));
-  }
-
-  void setCoin(BuildContext context, bool isFrom){
-
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(builder: (context) => SelectSwapToken(itemLE: lstLECoin.value))
-    // ).then((res) {
-
-    //   if (res != null){
-
-    //     if (isFrom == true){
-
-    //       coin1.value = lstLECoin.value[res];
-    //       swapModel.from = coin1.value.title;
-    //       swapModel.networkFrom = coin1.value.networkCode;
-
-    //     } else {
-          
-    //       coin2.value = lstLECoin.value[res];
-    //       swapModel.to = coin2.value.title;
-    //       swapModel.networkTo = coin2.value.networkCode;
-    //     }
-
-    //     swapModel.withdrawal = Provider.of<SDKProvider>(context, listen: false).getSdkImpl.evmAddress;
-        
-    //     queryEstimateAmt();
-        
-    //     if (Validator.swapValidator(swapModel.from!, swapModel.to!, swapModel.amt!.value) == true){
-    //       isReady.value = true;
-    //     } else if (isReady.value == false) {
-    //       isReady.value = false;
-    //     }
-        
-    //   }
+    // print({
+    //   "from": swapModel.from,
+    //   "to": swapModel.to,
+    //   "network_from": swapModel.networkFrom,
+    //   "network_to": swapModel.networkTo,
+    //   "amount": swapModel.amt!.value
     // });
+
+    return await _letsExchangeRepoImpl.twoCoinInfo({
+      "from": coin1.code,
+      "to": coin2.code,
+      "amount": swapModel.amt!.value
+    }).then((value) async {
+      return (json.decode(value.body))['amount'];
+    });
+
   }
 
   @override

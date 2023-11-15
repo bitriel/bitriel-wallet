@@ -180,11 +180,11 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI {
   }
 
   @override
-  Future<Map<String, dynamic>> rate(ExchangeCoinI coin1, ExchangeCoinI coin2, SwapModel swapModel) async {
+  Future<String> rate(ExchangeCoinI coin1, ExchangeCoinI coin2, SwapModel swapModel) async {
 
     return await _exolixExchangeRepoImpl.exolixTwoCoinInfo(
       "coinFrom=${coin1.code}&networkFrom=${coin1.network}&coinTo=${coin2.code}&networkTo=${coin2.network}&amount=${swapModel.amt!.value}&rateType=fixed"
-    ).then((value) => json.decode(value.body));
+    ).then((value) => json.decode(value.body)['toAmount']);
 
   }
 
