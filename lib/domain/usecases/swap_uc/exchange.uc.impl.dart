@@ -16,7 +16,8 @@ class ExchangeUcImpl<T> {
   ValueNotifier<bool> isReady = ValueNotifier(false);
 
   ValueNotifier<bool> statusNotifier = ValueNotifier(false);
-  ValueNotifier<num> receivedAmt = ValueNotifier<num>(0);
+  ValueNotifier<bool> receiveingAmt = ValueNotifier(false);
+  String receivedAmt = "";
 
   // Instance Variable
   List<Exchange>? exchanges;
@@ -98,26 +99,35 @@ class ExchangeUcImpl<T> {
 
   void queryEstimateAmt() {
 
-    // if (coin1 != null && coin2 != null){
+    print("queryEstimateAmt");
 
-    //   EasyDebounce.debounce("queryEstimateAmt", const Duration(milliseconds: 500), () async {
+    if (receiveingAmt.value == false) receiveingAmt.value = true;
 
-    //     await _exolixExchangeRepoImpl.exolixTwoCoinInfo({
-    //       "coinFrom": swapModel.coinFrom,
-    //       "coinTo": swapModel.coinTo,
-    //       "coinFromNetwork": swapModel.networkFrom,
-    //       "coinToNetwork": swapModel.networkTo,
-    //       "amount": swapModel.amt!.value,
-    //       "rateType": "fixed"
-    //     }).then((value) {
+    EasyDebounce.debounce("queryEstimateAmt", const Duration(milliseconds: 500), () async {
 
-    //       if (value.statusCode == 200) {
-    //         // receivedAmt.value = (json.decode(value.body))['toAmount'].toString();
-    //       }
-    //     });
-    //   });
-      
-    // }
+      if (coin1 != null && coin2 != null){
+
+        receivedAmt = (await exolicUCImpl.rate(coin1!, coin2!, swapModel))['toAmount'].toString();
+
+        receiveingAmt.value = false;
+        // EasyDebounce.debounce("queryEstimateAmt", const Duration(milliseconds: 500), () async {
+
+        //   await exolicUCImpl.rate({
+        //     "coinFrom": swapModel.coinFrom,
+        //     "coinTo": swapModel.coinTo,
+        //     "coinFromNetwork": swapModel.networkFrom,
+        //     "coinToNetwork": swapModel.networkTo,
+        //     "amount": swapModel.amt!.value,
+        //     "rateType": "fixed"
+        //   }).then((value) {
+
+        //     if (value.statusCode == 200) {
+        //       // receivedAmt.value = (json.decode(value.body))['toAmount'].toString();
+        //     }
+        //   });
+        
+      }
+    });
   }
 
   void setCoin(BuildContext context, bool isFrom){

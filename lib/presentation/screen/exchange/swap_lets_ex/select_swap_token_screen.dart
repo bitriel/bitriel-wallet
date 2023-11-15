@@ -161,7 +161,9 @@ class SelectSwapToken extends StatelessWidget {
         fontSize: 13,
         textAlign: TextAlign.start,
       ),
-      onTap: coin1 != null || coin2 != null ? null : () {
+      onTap: 
+      // coin1 != null || coin2 != null ? null : 
+      () {
         Navigator.pop(context, index);
       },
     );

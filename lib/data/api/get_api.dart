@@ -140,12 +140,11 @@ class GetRequest {
     );
   }
 
-  Future<http.Response> exolixTwoCoinInfo(Map<String, dynamic> queryParameters) async {
+  static Future<http.Response> exolixTwoCoinInfo(String headerConcrete) async {
     var url = dotenv.get('EXOLIX_URL');
     var api = dotenv.get('EXOLIX_API');
-    var token = dotenv.get('EXOLIX_TOKEN');
-    queryParameters.addAll({ 'apiToken': token });
-    var uri = Uri.parse("$url/$api/rate").replace(queryParameters: queryParameters);
+    
+    var uri = Uri.parse("$url/$api/rate?$headerConcrete");
 
     return await http.get(
       uri,

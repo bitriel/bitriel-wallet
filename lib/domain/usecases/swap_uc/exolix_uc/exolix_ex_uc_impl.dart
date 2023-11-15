@@ -129,7 +129,6 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI {
 
   }
 
-
   @override 
   void onDeleteTxt() {
 
@@ -171,8 +170,6 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI {
       
       }
 
-      queryEstimateAmt();
-
       // if (Validator.swapValidator(swapModel.coinFrom!, swapModel.coinTo!, swapModel.amt!.value) == true){
       //   isReady.value = true;
       // } else if (isReady.value == true){
@@ -182,26 +179,13 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI {
 
   }
 
-  void queryEstimateAmt() {
+  @override
+  Future<Map<String, dynamic>> rate(ExchangeCoinI coin1, ExchangeCoinI coin2, SwapModel swapModel) async {
 
-    if (swapModel.coinFrom!.isNotEmpty && swapModel.coinTo!.isNotEmpty){
+    return await _exolixExchangeRepoImpl.exolixTwoCoinInfo(
+      "coinFrom=${coin1.code}&networkFrom=${coin1.network}&coinTo=${coin2.code}&networkTo=${coin2.network}&amount=${swapModel.amt!.value}&rateType=fixed"
+    ).then((value) => json.decode(value.body));
 
-      EasyDebounce.debounce("tag", const Duration(milliseconds: 500), () async {
-        await _exolixExchangeRepoImpl.exolixTwoCoinInfo({
-          "coinFrom": swapModel.coinFrom,
-          "coinTo": swapModel.coinTo,
-          "coinFromNetwork": swapModel.networkFrom,
-          "coinToNetwork": swapModel.networkTo,
-          "amount": swapModel.amt!.value,
-          "rateType": "fixed"
-        }).then((value) {
-
-          if (value.statusCode == 200) {
-            receiveAmt.value = (json.decode(value.body))['toAmount'].toString();
-          }
-        });
-      });
-    }
   }
 
   void setCoin(BuildContext context, bool isFrom){

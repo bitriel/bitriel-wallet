@@ -1,3 +1,5 @@
+import 'package:bitriel_wallet/index.dart';
+
 abstract class ExchangeCoinI {
 
   // set setContext(BuildContext ctx);
@@ -19,5 +21,7 @@ abstract class ExchangeCoinI {
   String? icon;
   
   Future<List<ExchangeCoinI>> getCoins();
+
+  Future<Map<String, dynamic>> rate(ExchangeCoinI coin1, ExchangeCoinI coin2, SwapModel swapModel);
 
 }

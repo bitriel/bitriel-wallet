@@ -241,7 +241,8 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI {
 
   }
 
-  void queryEstimateAmt() {
+  @override
+  Future<Map<String, dynamic>> rate(ExchangeCoinI coin1, ExchangeCoinI coin2, SwapModel swapModel) {
 
     // if (swapModel.from!.isNotEmpty && swapModel.to!.isNotEmpty){
     //   EasyDebounce.debounce("tag", const Duration(milliseconds: 500), () async {
@@ -259,6 +260,7 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI {
     //     });
     //   });
     // }
+    return Future.delayed(const Duration(seconds: 2));
   }
 
   void setCoin(BuildContext context, bool isFrom){

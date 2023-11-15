@@ -4,6 +4,6 @@ import 'package:bitriel_wallet/index.dart';
 abstract class ExolixExchangeRepository {
   Future<List<Map<String, dynamic>>> getExolixExchangeCoin();
   Future<Response> getExolixExStatusByTxId(String txId);
-  Future<Response> exolixTwoCoinInfo(Map<String, dynamic> jsn);
+  Future<Response> exolixTwoCoinInfo(String headerConcrete);
   Future<Response> exolixSwap(Map<String, dynamic> mapData);
 }

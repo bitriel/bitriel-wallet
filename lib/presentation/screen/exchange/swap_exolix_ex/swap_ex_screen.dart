@@ -106,6 +106,7 @@ class SwapExolicExchange extends StatelessWidget {
             ),
 
             const MyTextConstant(text: "Exchange",),
+            
             ValueListenableBuilder(
               valueListenable: _exchangeUcImpl.isExchangeStateReady,
               builder: (context, isExchangeStateReady, wg) {
@@ -131,7 +132,7 @@ class SwapExolicExchange extends StatelessWidget {
             ),
 
             Center(
-              child: _buildNumberPad(context, _exchangeUcImpl.exolicUCImpl.swapModel.amt!.value, _exchangeUcImpl.exolicUCImpl.onDeleteTxt, _exchangeUcImpl.exolicUCImpl.formatDouble)
+              child: _buildNumberPad(context, _exchangeUcImpl.swapModel.amt!.value, _exchangeUcImpl.onDeleteTxt, _exchangeUcImpl.formatDouble)
             ),
 
             // Swap Button
@@ -194,11 +195,17 @@ class SwapExolicExchange extends StatelessWidget {
                         borderRadius: BorderRadius.circular(50.0),
                         color: hexaCodeToColor(AppColors.background)
                       ),
-                      child: MyTextConstant(
-                        textAlign: TextAlign.start,
-                        text: leUCImpl.swapModel.amt!.value.isEmpty ? "0.00" : leUCImpl.swapModel.amt!.value.toString(),
-                        fontSize: 20,
-                        color2: leUCImpl.swapModel.amt!.value.isEmpty ? hexaCodeToColor(AppColors.grey) : hexaCodeToColor(AppColors.midNightBlue),
+                      child: ValueListenableBuilder(
+                        valueListenable: leUCImpl.swapModel.amt!,
+                        builder: (context, amt, widget) {
+
+                          return MyTextConstant(
+                            textAlign: TextAlign.start,
+                            text: leUCImpl.swapModel.amt!.value.isEmpty ? "0.00" : amt.toString(),
+                            fontSize: 20,
+                            color2: leUCImpl.swapModel.amt!.value.isEmpty ? hexaCodeToColor(AppColors.grey) : hexaCodeToColor(AppColors.midNightBlue),
+                          );
+                        }
                       ),
                     ),
                   ),
@@ -259,10 +266,29 @@ class SwapExolicExchange extends StatelessWidget {
                                   child: ClipRRect(borderRadius: BorderRadius.circular(50), child: Image.network(leUCImpl.coin1!.icon!)) //_buildImageItem(index),
                                 ),
 
-                                MyTextConstant(
-                                  text: leUCImpl.coin1 != null ? leUCImpl.coin1?.coinName : 'Select Token',
-                                  // color2: coin1.title == null ? hexaCodeToColor(AppColors.grey) : hexaCodeToColor(AppColors.midNightBlue),
-                                  // fontWeight: coin1.title == null ? FontWeight.normal : FontWeight.bold,
+                                Column(
+                                  children: [
+
+                                    MyTextConstant(
+                                      text: leUCImpl.coin1 != null ? leUCImpl.coin1?.coinName : 'Select Token',
+                                      // color2: coin1.title == null ? hexaCodeToColor(AppColors.grey) : hexaCodeToColor(AppColors.midNightBlue),
+                                      // fontWeight: coin1.title == null ? FontWeight.normal : FontWeight.bold,
+                                    ),
+
+                                    if (leUCImpl.coin1 != null) Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                      decoration: BoxDecoration(
+                                        color: leUCImpl.coin1!.shortName == "BEP20" ? Colors.cyanAccent : const Color.fromARGB(255, 96, 237, 169),
+                                        borderRadius: BorderRadius.circular(10)
+                                      ),
+                                      child: MyTextConstant(
+                                        text: leUCImpl.coin1!.shortName ?? '',
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                        textAlign: TextAlign.start,
+                                      ),
+                                    )
+                                  ],
                                 )
                               ],
                             );
@@ -317,12 +343,15 @@ class SwapExolicExchange extends StatelessWidget {
                         color: hexaCodeToColor(AppColors.background)
                       ),
                       child: ValueListenableBuilder(
-                        valueListenable: leUCImpl.exolicUCImpl.receiveAmt,
-                        builder: (context, receiveAmt, wg) {
+                        valueListenable: leUCImpl.receiveingAmt,
+                        builder: (context, receiveingAmt, wg) {
+
+                          if (receiveingAmt == true) return const CircularProgressIndicator();
+
                           return MyTextConstant(
                             textAlign: TextAlign.start,
                             // text: pro.lstConvertCoin![pro.name2] != null ? "≈ ${pro.lstConvertCoin![pro.name2]}" : "≈ 0",
-                            text: "≈ $receiveAmt",
+                            text: "≈ ${leUCImpl.receivedAmt}",
                             fontSize: 20,
                           );
                         }
@@ -393,10 +422,29 @@ class SwapExolicExchange extends StatelessWidget {
                                   child: ClipRRect(borderRadius: BorderRadius.circular(50), child: Image.network(leUCImpl.coin2!.icon!)) //_buildImageItem(index),
                                 ),
 
-                                MyTextConstant(
-                                  text: leUCImpl.coin2 != null ? leUCImpl.coin2?.coinName : 'Select Token',
-                                  // color2: coin1.title == null ? hexaCodeToColor(AppColors.grey) : hexaCodeToColor(AppColors.midNightBlue),
-                                  // fontWeight: coin1.title == null ? FontWeight.normal : FontWeight.bold,
+                                Column(
+                                  children: [
+
+                                    MyTextConstant(
+                                      text: leUCImpl.coin2 != null ? leUCImpl.coin2?.coinName : 'Select Token',
+                                      // color2: coin1.title == null ? hexaCodeToColor(AppColors.grey) : hexaCodeToColor(AppColors.midNightBlue),
+                                      // fontWeight: coin1.title == null ? FontWeight.normal : FontWeight.bold,
+                                    ),
+
+                                    if (leUCImpl.coin2 != null) Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                      decoration: BoxDecoration(
+                                        color: leUCImpl.coin2!.shortName == "BEP20" ? Colors.cyanAccent : const Color.fromARGB(255, 96, 237, 169),
+                                        borderRadius: BorderRadius.circular(10)
+                                      ),
+                                      child: MyTextConstant(
+                                        text: leUCImpl.coin2!.shortName ?? '',
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                        textAlign: TextAlign.start,
+                                      ),
+                                    )
+                                  ],
                                 )
                               ],
                             );

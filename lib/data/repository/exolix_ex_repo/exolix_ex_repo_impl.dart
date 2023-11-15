@@ -34,8 +34,9 @@ class ExolixExchangeRepoImpl implements ExolixExchangeRepository {
   }
 
   @override
-  Future<Response> exolixTwoCoinInfo(Map<String, dynamic> jsn) async {
-    return await PostRequest().twoCoinInfo(jsn);
+  Future<Response> exolixTwoCoinInfo(String headerConcrete) async {
+    print("exolixTwoCoinInfo $headerConcrete");
+    return await GetRequest.exolixTwoCoinInfo(headerConcrete);
   }
 
   @override
