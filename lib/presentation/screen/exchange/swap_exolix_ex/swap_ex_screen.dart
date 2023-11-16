@@ -50,7 +50,7 @@ class SwapExolicExchange extends StatelessWidget {
                 onPressed: isReady == false ? null : () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (builder) => StatusExolixExchange(exolixExchangeUCImpl: _exchangeUcImpl.exolicUCImpl,))
+                    MaterialPageRoute(builder: (builder) => StatusExolixExchange(exchangeUcImpl: _exchangeUcImpl,))
                   );
                 }, 
                 child: MyTextConstant(
@@ -137,15 +137,16 @@ class SwapExolicExchange extends StatelessWidget {
 
             // Swap Button
             ValueListenableBuilder(
-              valueListenable: _exchangeUcImpl.exolicUCImpl.isReady,
-              builder: (context, isReady, wg) {
+              valueListenable: _exchangeUcImpl.isBtn,
+              builder: (context, isBtn, wg) {
+
                 return MyButton(
                   edgeMargin: const EdgeInsets.all(paddingSize),
                   textButton: "Swap",
-                  buttonColor: isReady == false ? AppColors.greyCode : AppColors.primaryBtn,
-                  action: isReady == false ? null : 
+                  buttonColor: isBtn == false ? AppColors.greyCode : AppColors.primaryBtn,
+                  action: isBtn == false ? null : 
                   () async {
-                    await _exchangeUcImpl.exolicUCImpl.exolixSwap();
+                    await _exchangeUcImpl.swap();
                   },
                 );
               }

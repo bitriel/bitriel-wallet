@@ -1,10 +1,11 @@
+import 'package:bitriel_wallet/domain/usecases/swap_uc/exchange.uc.impl.dart';
 import 'package:bitriel_wallet/index.dart';
 
 class StatusExolixExchange extends StatelessWidget {
 
-  final ExolixExchangeUCImpl? exolixExchangeUCImpl;
+  final ExchangeUcImpl? exchangeUcImpl;
 
-  const StatusExolixExchange({super.key, required this.exolixExchangeUCImpl});
+  const StatusExolixExchange({super.key, required this.exchangeUcImpl});
 
   @override
   Widget build(BuildContext context) {
@@ -14,66 +15,67 @@ class StatusExolixExchange extends StatelessWidget {
       body: Column(
         children: [
 
-          ValueListenableBuilder(
-            valueListenable: exolixExchangeUCImpl!.isReady,
-            builder: (context, lst, wg) {
+          // ValueListenableBuilder(
+          //   valueListenable: exchangeUcImpl!.isReady,
+          //   builder: (context, lst, wg) {
 
-              if (exolixExchangeUCImpl!.lstTx!.isEmpty){
-                return Center(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+          //     if (exchangeUcImpl!.lstTx!.isEmpty){
+          //       return Center(
+          //         child: Column(
+          //           crossAxisAlignment: CrossAxisAlignment.center,
+          //           mainAxisAlignment: MainAxisAlignment.center,
+          //           children: [
                 
-                      Padding(
-                        padding: const EdgeInsets.only(top: 150),
-                        child: Lottie.asset(
-                          "assets/animation/search_empty.json",
-                          repeat: false,
-                          height: 200,
-                          width: 200
-                        ),
-                      ),
+          //             Padding(
+          //               padding: const EdgeInsets.only(top: 150),
+          //               child: Lottie.asset(
+          //                 "assets/animation/search_empty.json",
+          //                 repeat: false,
+          //                 height: 200,
+          //                 width: 200
+          //               ),
+          //             ),
                 
-                      const MyTextConstant(
-                        text: "No request exchange activity.",
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      )
+          //             const MyTextConstant(
+          //               text: "No request exchange activity.",
+          //               fontSize: 20,
+          //               fontWeight: FontWeight.bold,
+          //             )
                 
-                    ],
-                  ),
-                );
-              }
+          //           ],
+          //         ),
+          //       );
+          //     }
 
-              // ignore: curly_braces_in_flow_control_structures, unnecessary_null_comparison
-              else if (lst == null) return Expanded(
-                child: Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
-                  child: ListView.builder(
-                  itemCount: 6,
-                  itemBuilder: (context, index) {
-                    return Card(
-                    elevation: 1.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: const SizedBox(height: 80),
-                    );
-                  },
-                  ),
-                )
-              );
+          //     // ignore: curly_braces_in_flow_control_structures, unnecessary_null_comparison
+          //     else if (lst == null) return Expanded(
+          //       child: Shimmer.fromColors(
+          //         baseColor: Colors.grey[300]!,
+          //         highlightColor: Colors.grey[100]!,
+          //         child: ListView.builder(
+          //         itemCount: 6,
+          //         itemBuilder: (context, index) {
+          //           return Card(
+          //           elevation: 1.0,
+          //           shape: RoundedRectangleBorder(
+          //             borderRadius: BorderRadius.circular(16),
+          //           ),
+          //           child: const SizedBox(height: 80),
+          //           );
+          //         },
+          //         ),
+          //       )
+          //     );
               
-              return ListView(
-                shrinkWrap: true,
-                children: exolixExchangeUCImpl!.lstTx!.reversed.map((e) {
-                  return _statusSwapRes(exolixExchangeUCImpl: exolixExchangeUCImpl!, index: exolixExchangeUCImpl!.lstTx!.indexOf(e));
-                }).toList(),
-              );
-            }
-          ),
+          //     return ListView(
+          //       shrinkWrap: true,
+          //       children: exchangeUcImpl!.lstTx!.reversed.map((e) {
+          //         return _statusSwapRes(exolixExchangeUCImpl: exolixExchangeUCImpl!, index: exolixExchangeUCImpl!.lstTx!.indexOf(e));
+          //       }).toList(),
+          //     );
+          //   }
+          // )
+
         ],
       ),
     );

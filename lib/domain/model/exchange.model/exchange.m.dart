@@ -6,8 +6,15 @@ class Exchange {
   List<ExchangeCoinI> coins = [];
   Function getCoins;
   Function rate;
+  Function swap;
 
-  Exchange({required this.title, required this.getCoins, this.coins = const [], required this.rate});
+  Exchange({
+    required this.title, 
+    required this.getCoins, 
+    this.coins = const [], 
+    required this.rate,
+    required this.swap
+  });
 
 }
 

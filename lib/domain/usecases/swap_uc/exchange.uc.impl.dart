@@ -14,6 +14,7 @@ class ExchangeUcImpl<T> {
   ValueNotifier<bool> isExchangeStateReady = ValueNotifier(false);
   
   ValueNotifier<bool> isReady = ValueNotifier(false);
+  ValueNotifier<bool> isBtn = ValueNotifier(false);
 
   ValueNotifier<bool> statusNotifier = ValueNotifier(false);
   ValueNotifier<bool> receiveingAmt = ValueNotifier(false);
@@ -28,6 +29,8 @@ class ExchangeUcImpl<T> {
   
   final SecureStorageImpl _secureStorageImpl = SecureStorageImpl();
 
+  BuildContext? _context;
+
   // defaultLstCoins
   List<ExchangeCoinI>? defaultLstCoins;
   List<T>? lstTx;
@@ -37,13 +40,14 @@ class ExchangeUcImpl<T> {
   set setContext(BuildContext ctx){
     exolicUCImpl.setContext = ctx;
     letsExchangeUCImpl.setContext = ctx;
+    _context = ctx;
   }
 
   void initExchangeState() async {
     
     exchanges = [
-      Exchange(title: 'Exolix', getCoins: exolicUCImpl.getCoins, rate: exolicUCImpl.rate),
-      Exchange(title: 'LetsExchange', getCoins: letsExchangeUCImpl.getCoins, rate: letsExchangeUCImpl.rate) 
+      Exchange(title: 'Exolix', getCoins: exolicUCImpl.getCoins, rate: exolicUCImpl.rate, swap: exolicUCImpl.exolixSwap),
+      Exchange(title: 'LetsExchange', getCoins: letsExchangeUCImpl.getCoins, rate: letsExchangeUCImpl.rate, swap: letsExchangeUCImpl.letsExchangeSwap) 
     ];
 
     isExchangeStateReady.value = true;
@@ -148,6 +152,7 @@ class ExchangeUcImpl<T> {
         if (isFrom == true){
 
           coin1 = exchanges![currentIndex.value].coins[res];
+          swapModel.from = coin1!.code;
           // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
           isCoin1.notifyListeners();
         //   swapModel.coinFrom = coin1.value.title;
@@ -156,6 +161,7 @@ class ExchangeUcImpl<T> {
         } else {
 
           coin2 = exchanges![currentIndex.value].coins[res];
+          swapModel.to = coin2!.code;
           // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
           isCoin2.notifyListeners();
           
@@ -189,7 +195,6 @@ class ExchangeUcImpl<T> {
     }
   }
 
-  @override 
   void onDeleteTxt() {
 
     final formattedValue = formatCurrencyText(swapModel.amt!.value);
@@ -231,11 +236,12 @@ class ExchangeUcImpl<T> {
 
       queryEstimateAmt();
 
-      // if (Validator.swapValidator(swapModel.coinFrom!, swapModel.coinTo!, swapModel.amt!.value) == true){
-      //   isReady.value = true;
-      // } else if (isReady.value == true){
-      //   isReady.value = false;
-      // }
+      if (Validator.swapValidator(swapModel.from!, swapModel.to!, swapModel.amt!.value) == true){
+        isBtn.value = true;
+      } else if (isReady.value == true){
+        isBtn.value = false;
+      }
+
     }
 
   }
@@ -256,5 +262,60 @@ class ExchangeUcImpl<T> {
       isCoin2.notifyListeners();
     }
   }
+
+  Future<void> swap() async {
+
+    print("swap");
+
+    try {
+
+      // Response value = Response(json.encode(map), 200);
+
+      dialogLoading(_context!);
+
+      await exchanges![currentIndex.value].swap(swapModel).then( (res) async {
+        
+      });
+
+    } catch (e) {
+      
+      // Close Dialog
+      Navigator.pop(_context!);
+      
+      await QuickAlert.show(
+        context: _context!,
+        type: QuickAlertType.error,
+        text: '$e',
+      );
+    }
+
+  }
+
+  // Index Of List
+  // Future<void> paySwap(int index) async {
+    
+  //   Navigator.push(
+  //     _context!,
+  //     MaterialPageRoute(builder: (context) => const PincodeScreen(title: '', label: PinCodeLabel.fromSendTx,))
+  //   ).then((value) async {
+
+  //     _paymentUcImpl.recipientController.text = lstTx![index].deposit!;
+  //     _paymentUcImpl.amountController.text = lstTx![index].deposit_amount!;
+
+  //     if (value != null){
+  //       await _paymentUcImpl.sendBep20();
+  //     }
+  //   });
+
+  // }
+
+  // @override
+  // Future<void> confirmSwap(int indx) async {
+  //   index = indx;
+  //   Navigator.push(
+  //     _context!,
+  //     MaterialPageRoute(builder: (context) => ConfirmSwapExchange( statusNotifier: statusNotifier, swapResModel: lstTx![index!], confirmSwap: swapping, getStatus: getStatus))
+  //   );
+  // }
 
 }

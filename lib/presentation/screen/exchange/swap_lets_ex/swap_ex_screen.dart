@@ -104,7 +104,7 @@ class SwapExchange extends StatelessWidget {
                   textButton: "Swap",
                   buttonColor: isReady == false ? AppColors.greyCode : AppColors.primaryBtn,
                   action: isReady == false ? null : () async {
-                    await letsExchangeUCImpl.swap();
+                    // await letsExchangeUCImpl.swap();
                   },
                 );
               }

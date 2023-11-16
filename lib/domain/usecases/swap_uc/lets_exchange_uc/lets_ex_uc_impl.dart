@@ -182,64 +182,47 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI {
   }
 
   @override
-  Future<void> swap() async {
+  Future<void> letsExchangeSwap(SwapModel swapModel) async {
     
-    // try {
-
-    //   dialogLoading(_context!);
-
-    //   await _letsExchangeRepoImpl.swap(swapModel.toJson()).then((value) async {
+    await _letsExchangeRepoImpl.swap(swapModel.toJson()).then((value) async {
         
-    //     if (value.statusCode == 401){
-    //       throw json.decode(value.body)['error'];
-    //     }
-    //     // Unprocessable entity
-    //     else if (value.statusCode == 422) {
-    //       throw (json.decode(value.body)['error']['validation'].containsKey("coin_from") 
-    //         ? "The selected first coin is not active." 
-    //         : "The selected second coin is not active." 
-    //       );
-    //     }
+      if (value.statusCode == 401){
+        throw json.decode(value.body)['error'];
+      }
+      // Unprocessable entity
+      else if (value.statusCode == 422) {
+        throw (json.decode(value.body)['error']['validation'].containsKey("coin_from") 
+          ? "The selected first coin is not active." 
+          : "The selected second coin is not active." 
+        );
+      }
 
-    //     else if (value.statusCode == 200) {
+      else if (value.statusCode == 200) {
 
-    //       lstTx!.add(SwapResModel.fromJson(json.decode(value.body)));
-          
-    //       await SecureStorageImpl().writeSecure(DbKey.lstTxIds, json.encode(SwapResModel().toJson(lstTx!)));
+        lstTx!.add(SwapResModel.fromJson(json.decode(value.body)));
+        
+        await SecureStorageImpl().writeSecure(DbKey.lstTxIds, json.encode(SwapResModel().toJson(lstTx!)));
 
-    //       // Close Dialog
-    //       Navigator.pop(_context!);
+        // Close Dialog
+        Navigator.pop(_context!);
 
-    //       await QuickAlert.show(
-    //         context: _context!,
-    //         type: QuickAlertType.success,
-    //         showCancelBtn: true,
-    //         cancelBtnText: "Close",
-    //         cancelBtnTextStyle: TextStyle(fontSize: 14, color: hexaCodeToColor(AppColors.primaryBtn)),
-    //         confirmBtnText: "Confirm",
-    //         text: 'Swap Successfully!',
-    //         onConfirmBtnTap: () {
-    //           confirmSwap(lstTx!.length - 1);
-    //         },
-    //       );
-    //     } else {
-    //       throw json.decode(value.body);
-    //     }
-    //   });
-
-    // } catch (e) {
-
-    //   print(e);
-
-    //   // Close Dialog
-    //   Navigator.pop(_context!);
-      
-    //   await QuickAlert.show(
-    //     context: _context!,
-    //     type: QuickAlertType.error,
-    //     text: '$e',
-    //   );
-    // }
+        await QuickAlert.show(
+          context: _context!,
+          type: QuickAlertType.success,
+          showCancelBtn: true,
+          cancelBtnText: "Close",
+          cancelBtnTextStyle: TextStyle(fontSize: 14, color: hexaCodeToColor(AppColors.primaryBtn)),
+          confirmBtnText: "Confirm",
+          text: 'Swap Successfully!',
+          onConfirmBtnTap: () {
+            confirmSwap(lstTx!.length - 1);
+          },
+        );
+      } else {
+        throw json.decode(value.body);
+      }
+    });
+    
   }
 
   // Index Of List
