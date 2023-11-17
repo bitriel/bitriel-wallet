@@ -1,4 +1,5 @@
 import 'package:bitriel_wallet/index.dart';
+import 'package:bitriel_wallet/presentation/screen/swap_exolix_ex/swap_ex_screen.dart';
 
 class HomeScreen extends StatelessWidget {
 
@@ -22,7 +23,6 @@ class HomeScreen extends StatelessWidget {
     walletProvider.marketUCImpl.scrollController.addListener(() {
       walletProvider.marketUCImpl.backToTop.value = walletProvider.marketUCImpl.scrollController.offset > 400 ? true : false;
     });
-
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -64,8 +64,8 @@ class HomeScreen extends StatelessWidget {
   : const SizedBox();
 
   Widget _menuItems(BuildContext context) {
+    
     return Container(
-      // padding: const EdgeInsets.all(14),
       margin: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: hexaCodeToColor(AppColors.cardColor),
@@ -77,6 +77,7 @@ class HomeScreen extends StatelessWidget {
             padding: const EdgeInsets.only(top: 14, right: 14, left: 14, bottom: 14 / 2 ),
             child: Column(
               children: [
+
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 5),
                   child: Row(
@@ -90,7 +91,8 @@ class HomeScreen extends StatelessWidget {
                           action: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (builder) => const SwapExchange())
+                              // MaterialPageRoute(builder: (builder) => SwapExchange())
+                              MaterialPageRoute(builder: (builder) => SwapExolicExchange())
                             );
                           },
                         ),
@@ -115,6 +117,7 @@ class HomeScreen extends StatelessWidget {
                     ],
                   ),
                 ),
+
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 5),
                   child: Row(
@@ -153,24 +156,11 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                ),
+                )
+
               ],
             ),
           ),
-
-          // Padding(
-          //   padding: const EdgeInsets.only(right: 14, left: 14, bottom: 14 / 2 ),
-          //   child: Divider(
-          //     color: hexaCodeToColor("#78839C").withOpacity(0.25),
-          //   ),
-          // ),
-
-          // SizedBox(
-          //   height: 30,
-          //   child: _listScrollMenuItem()
-          // ),
-
-          // const SizedBox(height: 14,),
 
         ],
       ),

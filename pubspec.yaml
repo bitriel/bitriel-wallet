@@ -75,7 +75,7 @@ dependencies:
   #     ref: main
   easy_debounce: ^2.0.3
   dropdown_button2: ^2.3.7
-  flutter_inappwebview: ^5.7.2+3
+  flutter_inappwebview: ^5.8.0
   url_launcher: ^6.1.12
   share_plus: ^7.1.0
   icons_launcher: ^2.1.3

@@ -1,14 +1,15 @@
 import 'package:bitriel_wallet/index.dart';
 
 class MainScreen extends StatelessWidget {
-  const MainScreen({super.key});
+  
+  MainScreen({super.key});
+
+  final NavbarUsecaseImpl navbarUsecaseImpl = NavbarUsecaseImpl();
+
+  final MultiAccountImpl multiAccountImpl = MultiAccountImpl();
 
   @override
   Widget build(BuildContext context) {
-
-    final NavbarUsecaseImpl navbarUsecaseImpl = NavbarUsecaseImpl();
-
-    final MultiAccountImpl multiAccountImpl = MultiAccountImpl();
 
     return ValueListenableBuilder(
       valueListenable: navbarUsecaseImpl.currentIndex,

@@ -60,7 +60,7 @@ class AppUsecasesImpl implements AppUsecases {
       if(value == true) {
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const MainScreen()),
+          MaterialPageRoute(builder: (context) => MainScreen()),
           (route) => false 
         );
       }
@@ -125,12 +125,12 @@ class AppUsecasesImpl implements AppUsecases {
     
     if (sdkProvider!.getSdkImpl.getKeyring.allAccounts.isNotEmpty){
       await Future.delayed(const Duration(milliseconds: 200), (){
+
         Navigator.pushAndRemoveUntil(
           _context!, 
-          MaterialPageRoute(builder: (context) => const MainScreen()), 
+          MaterialPageRoute(builder: (context) => MainScreen()), 
           (route) => false
         );
-
       });
     } else {
 

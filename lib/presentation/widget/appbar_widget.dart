@@ -74,13 +74,14 @@ PreferredSizeWidget defaultAppBar({
               child: Consumer<SDKProvider>(
               builder: (context, pro, wg) {
                   if (pro.isConnected == false) return const SizedBox();
-                  return pro.getSdkImpl.getKeyring.current.icon == null ? 
-                    const CircleAvatar() : 
-                    RandomAvatar(
-                      pro.getSdkImpl.getKeyring.current.icon!,
-                      height: 40,
-                      width: 40
-                    );
+                  
+                  return pro.getSdkImpl.getKeyring.current.icon == null 
+                  ? const CircleAvatar() 
+                  : RandomAvatar(
+                    pro.getSdkImpl.getKeyring.current.address!,
+                    height: 40,
+                    width: 40
+                  );
                 }
               ),
             )

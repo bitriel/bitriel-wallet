@@ -117,4 +117,39 @@ class GetRequest {
     });
   }
 
+    /*--------------- EXOLIX API FUNCTION ---------------*/
+  static Future<http.Response> getExolixExStatusByTxId(String id) async {
+    var url = dotenv.get('EXOLIX_URL');
+    var api = dotenv.get('EXOLIX_API');
+    var uri = Uri.parse("$url/$api/transactions/$id");
+    
+    return await http.get(
+      uri,
+      headers: conceteHeader()
+    );
+  }
+
+  static Future<http.Response> getExolixExchangeCoin() async {
+    var url = dotenv.get('EXOLIX_URL');
+    var api = dotenv.get('EXOLIX_API');
+    var uri = Uri.parse("$url/$api/currencies?all=true&withNetworks=true&networksList=BTC,BSC,ETH");
+
+    return await http.get(
+      uri,
+      headers: conceteHeader()
+    );
+  }
+
+  Future<http.Response> exolixTwoCoinInfo(Map<String, dynamic> queryParameters) async {
+    var url = dotenv.get('EXOLIX_URL');
+    var api = dotenv.get('EXOLIX_API');
+    var token = dotenv.get('EXOLIX_TOKEN');
+    queryParameters.addAll({ 'apiToken': token });
+    var uri = Uri.parse("$url/$api/rate").replace(queryParameters: queryParameters);
+
+    return await http.get(
+      uri,
+      headers: conceteHeader()
+    );
+  }
 }

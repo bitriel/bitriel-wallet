@@ -1,10 +1,11 @@
+import 'package:bitriel_wallet/domain/usecases/swap_uc/exolix_uc/exolix_ex_uc_impl.dart';
 import 'package:bitriel_wallet/index.dart';
 
-class StatusExchange extends StatelessWidget {
+class StatusExolixExchange extends StatelessWidget {
 
-  final LetsExchangeUCImpl? letsExchangeUCImpl;
+  final ExolixExchangeUCImpl? exolixExchangeUCImpl;
 
-  const StatusExchange({super.key, required this.letsExchangeUCImpl});
+  const StatusExolixExchange({super.key, required this.exolixExchangeUCImpl});
 
   @override
   Widget build(BuildContext context) {
@@ -13,19 +14,9 @@ class StatusExchange extends StatelessWidget {
       appBar: appBar(context, title: "Exchange Status"),
       body: Column(
         children: [
-          
-          // _inputExchangeID(),
-          
-          // MyButton(
-          //   edgeMargin: const EdgeInsets.all(paddingSize),
-          //   textButton: "Check",
-          //   action: () async {
-
-          //   },
-          // ),
 
           ValueListenableBuilder(
-            valueListenable: letsExchangeUCImpl!.lstTx,
+            valueListenable: exolixExchangeUCImpl!.lstTx,
             builder: (context, lst, wg) {
 
               if (lst.isEmpty){
@@ -79,7 +70,7 @@ class StatusExchange extends StatelessWidget {
               return ListView(
                 shrinkWrap: true,
                 children: lst.map((e) {
-                  return _statusSwapRes(letsExchangeUCImpl: letsExchangeUCImpl!, index: lst.indexOf(e));
+                  return _statusSwapRes(exolixExchangeUCImpl: exolixExchangeUCImpl!, index: lst.indexOf(e));
                 }).toList(),
               );
             }
@@ -89,26 +80,26 @@ class StatusExchange extends StatelessWidget {
     );
   }
 
-  Widget _statusSwapRes({required LetsExchangeUCImpl letsExchangeUCImpl, int? index}) {
+  Widget _statusSwapRes({required ExolixExchangeUCImpl exolixExchangeUCImpl, int? index}) {
     
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
       child: ListTile(
         onTap: () {
-          letsExchangeUCImpl.confirmSwap(index);
+          exolixExchangeUCImpl.exolixConfirmSwap(index);
         },
         title: MyTextConstant(
-          text: "Exchange ID: ${letsExchangeUCImpl.lstTx.value[index!]!.transaction_id}",
+          text: "Exchange ID: ${exolixExchangeUCImpl.lstTx.value[index!]!.id}",
           fontWeight: FontWeight.bold,
           textAlign: TextAlign.start,
         ),
         subtitle: MyTextConstant(
-          text: "Status: ${letsExchangeUCImpl.lstTx.value[index]!.created_at}",
+          text: "Status: ${exolixExchangeUCImpl.lstTx.value[index]!.createdAt}",
           color2: hexaCodeToColor(AppColors.iconGreyColor),
           textAlign: TextAlign.start,
         ),
         trailing: MyTextConstant(
-          text: "Status: ${letsExchangeUCImpl.lstTx.value[index]!.status}",
+          text: "Status: ${exolixExchangeUCImpl.lstTx.value[index]!.status}",
           color2: hexaCodeToColor(AppColors.primary),
           textAlign: TextAlign.end,
         ),

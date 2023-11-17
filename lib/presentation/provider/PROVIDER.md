@@ -1,0 +1,1 @@
+The presentation layer is responsible for displaying the user interface and handling user interactions. The provider folder contains the code that provides the data and state to the widgets in the presentation layer.

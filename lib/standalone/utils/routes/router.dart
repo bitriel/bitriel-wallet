@@ -32,7 +32,7 @@ class AppRouter {
     "/${BitrielRouter.createWalletRoute}": (context) => const CreateWalletScreen(),
     "/${BitrielRouter.importWalletRoute}": (context) => const ImportWalletScreen(),
     "/${BitrielRouter.walletRoute}": (context) => const WalletScreen(),
-    "/${BitrielRouter.homeRoute}": (context) => const MainScreen(),
+    "/${BitrielRouter.homeRoute}": (context) => MainScreen(),
   };
 
 }
