@@ -16,14 +16,14 @@ class SelectSwapToken extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    // final TextEditingController searchController = TextEditingController();
+    final TextEditingController searchController = TextEditingController();
 
     return Scaffold(
       appBar: appBar(context, title: "Select Token"),
       body: Column(
         children: [
       
-          // _searchBar(searchController, coin),
+          _searchBar(searchController, coin),
 
           Expanded(
             child: Stack(
@@ -65,7 +65,7 @@ class SelectSwapToken extends StatelessWidget {
     );
   }
 
-  Widget _searchBar(TextEditingController searchController, List<LetsExCoinByNetworkModel> coin) {
+  Widget _searchBar(TextEditingController searchController, List<ExchangeCoinI> coin) {
     return Padding(
       padding: const EdgeInsets.only(top: 15 / 2, left: 15, right: 15, bottom: 15 / 2),
       child: TextField(
@@ -122,9 +122,12 @@ class SelectSwapToken extends StatelessWidget {
       leading: SizedBox(
         height: 40, 
         width: 40, 
-        child: ClipRRect(
+        child: 
+        ClipRRect(
           borderRadius: BorderRadius.circular(50), 
-          child: coin[index].icon!.contains('.svg') ? SvgPicture.network(coin[index].icon!) : Image.network(coin[index].icon!)
+          child: coin[index].icon == null 
+          ? Container(color: Colors.blueAccent, width: 40, height: 40)
+          : coin[index].icon!.contains('.svg') ? SvgPicture.network(coin[index].icon!) : Image.network(coin[index].icon!)
         ) //_buildImageItem(index),
       ),
       title: Row(

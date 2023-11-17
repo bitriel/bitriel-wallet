@@ -20,14 +20,14 @@ class StatusExchange extends StatelessWidget {
           //   edgeMargin: const EdgeInsets.all(paddingSize),
           //   textButton: "Check",
           //   action: () async {
-
+    
           //   },
           // ),
-
+    
           ValueListenableBuilder(
             valueListenable: letsExchangeUCImpl!.isReady,
             builder: (context, isReady, wg) {
-
+    
               if (letsExchangeUCImpl!.lstTx == null) {
                 return Expanded(
                   child: Shimmer.fromColors(

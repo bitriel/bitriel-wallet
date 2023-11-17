@@ -24,7 +24,7 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI {
 
   ValueNotifier<List<LetsExCoinByNetworkModel>> lstLECoin = ValueNotifier([]);
 
-  List<SwapResModel>? lstTx;
+  List<SwapResModel>? lstTx = [];
   
   ValueNotifier<bool> statusNotifier = ValueNotifier(false);
 
@@ -183,8 +183,12 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI {
 
   @override
   Future<void> letsExchangeSwap(SwapModel swapModel) async {
-    
+    print("swapModel.toJson() ${swapModel.toJson()}");
+
     await _letsExchangeRepoImpl.swap(swapModel.toJson()).then((value) async {
+
+      print("statusCode ${value.statusCode}");
+      print("value ${value.body}");
         
       if (value.statusCode == 401){
         throw json.decode(value.body)['error'];
@@ -218,6 +222,7 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI {
             confirmSwap(lstTx!.length - 1);
           },
         );
+
       } else {
         throw json.decode(value.body);
       }

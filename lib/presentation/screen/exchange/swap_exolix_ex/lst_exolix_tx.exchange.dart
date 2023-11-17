@@ -10,73 +10,84 @@ class StatusExolixExchange extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     
-    return Scaffold(
-      appBar: appBar(context, title: "Exchange Status"),
-      body: Column(
-        children: [
-
-          // ValueListenableBuilder(
-          //   valueListenable: exchangeUcImpl!.isReady,
-          //   builder: (context, lst, wg) {
-
-          //     if (exchangeUcImpl!.lstTx!.isEmpty){
-          //       return Center(
-          //         child: Column(
-          //           crossAxisAlignment: CrossAxisAlignment.center,
-          //           mainAxisAlignment: MainAxisAlignment.center,
-          //           children: [
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: appBar(context, title: "Exchange Status"),
+        body: Column(
+          children: [
+    
+    
+            const TabBar(
+              tabs: [
+                Tab(text: "Exolix",),
+                Tab(text: "LetsExchange",)
+              ]
+            ),
+    
+            // ValueListenableBuilder(
+            //   valueListenable: exchangeUcImpl!.isReady,
+            //   builder: (context, lst, wg) {
+    
+            //     if (exchangeUcImpl!.lstTx!.isEmpty){
+            //       return Center(
+            //         child: Column(
+            //           crossAxisAlignment: CrossAxisAlignment.center,
+            //           mainAxisAlignment: MainAxisAlignment.center,
+            //           children: [
+                  
+            //             Padding(
+            //               padding: const EdgeInsets.only(top: 150),
+            //               child: Lottie.asset(
+            //                 "assets/animation/search_empty.json",
+            //                 repeat: false,
+            //                 height: 200,
+            //                 width: 200
+            //               ),
+            //             ),
+                  
+            //             const MyTextConstant(
+            //               text: "No request exchange activity.",
+            //               fontSize: 20,
+            //               fontWeight: FontWeight.bold,
+            //             )
+                  
+            //           ],
+            //         ),
+            //       );
+            //     }
+    
+            //     // ignore: curly_braces_in_flow_control_structures, unnecessary_null_comparison
+            //     else if (lst == null) return Expanded(
+            //       child: Shimmer.fromColors(
+            //         baseColor: Colors.grey[300]!,
+            //         highlightColor: Colors.grey[100]!,
+            //         child: ListView.builder(
+            //         itemCount: 6,
+            //         itemBuilder: (context, index) {
+            //           return Card(
+            //           elevation: 1.0,
+            //           shape: RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.circular(16),
+            //           ),
+            //           child: const SizedBox(height: 80),
+            //           );
+            //         },
+            //         ),
+            //       )
+            //     );
                 
-          //             Padding(
-          //               padding: const EdgeInsets.only(top: 150),
-          //               child: Lottie.asset(
-          //                 "assets/animation/search_empty.json",
-          //                 repeat: false,
-          //                 height: 200,
-          //                 width: 200
-          //               ),
-          //             ),
-                
-          //             const MyTextConstant(
-          //               text: "No request exchange activity.",
-          //               fontSize: 20,
-          //               fontWeight: FontWeight.bold,
-          //             )
-                
-          //           ],
-          //         ),
-          //       );
-          //     }
-
-          //     // ignore: curly_braces_in_flow_control_structures, unnecessary_null_comparison
-          //     else if (lst == null) return Expanded(
-          //       child: Shimmer.fromColors(
-          //         baseColor: Colors.grey[300]!,
-          //         highlightColor: Colors.grey[100]!,
-          //         child: ListView.builder(
-          //         itemCount: 6,
-          //         itemBuilder: (context, index) {
-          //           return Card(
-          //           elevation: 1.0,
-          //           shape: RoundedRectangleBorder(
-          //             borderRadius: BorderRadius.circular(16),
-          //           ),
-          //           child: const SizedBox(height: 80),
-          //           );
-          //         },
-          //         ),
-          //       )
-          //     );
-              
-          //     return ListView(
-          //       shrinkWrap: true,
-          //       children: exchangeUcImpl!.lstTx!.reversed.map((e) {
-          //         return _statusSwapRes(exolixExchangeUCImpl: exolixExchangeUCImpl!, index: exolixExchangeUCImpl!.lstTx!.indexOf(e));
-          //       }).toList(),
-          //     );
-          //   }
-          // )
-
-        ],
+            //     return ListView(
+            //       shrinkWrap: true,
+            //       children: exchangeUcImpl!.lstTx!.reversed.map((e) {
+            //         return _statusSwapRes(exolixExchangeUCImpl: exolixExchangeUCImpl!, index: exolixExchangeUCImpl!.lstTx!.indexOf(e));
+            //       }).toList(),
+            //     );
+            //   }
+            // )
+    
+          ],
+        ),
       ),
     );
   }

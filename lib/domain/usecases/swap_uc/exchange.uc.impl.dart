@@ -68,7 +68,9 @@ class ExchangeUcImpl<T> {
 
   Future<void> getExchangeCoins() async {
 
-    exchanges![currentIndex.value].coins = await exchanges![currentIndex.value].getCoins();
+    if (exchanges![currentIndex.value].coins.isEmpty){
+      exchanges![currentIndex.value].coins = await exchanges![currentIndex.value].getCoins();
+    }
 
     isReady.value = true;
 
@@ -153,6 +155,7 @@ class ExchangeUcImpl<T> {
 
           coin1 = exchanges![currentIndex.value].coins[res];
           swapModel.from = coin1!.code;
+          swapModel.networkFrom = coin1!.network;
           // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
           isCoin1.notifyListeners();
         //   swapModel.coinFrom = coin1.value.title;
@@ -162,6 +165,7 @@ class ExchangeUcImpl<T> {
 
           coin2 = exchanges![currentIndex.value].coins[res];
           swapModel.to = coin2!.code;
+          swapModel.networkTo = coin2!.network;
           // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
           isCoin2.notifyListeners();
           
@@ -187,6 +191,8 @@ class ExchangeUcImpl<T> {
   void switchExchange(int index) async {
 
     if (index != currentIndex.value){
+
+      isReady.value = false;
 
       currentIndex.value = index;
 
@@ -246,36 +252,17 @@ class ExchangeUcImpl<T> {
 
   }
 
-  void resetState() {
-
-    if (coin1 != null){
-
-      coin1 = null;
-      // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-      isCoin1.notifyListeners();
-
-    }
-    if (coin2 != null){
-
-      coin2 = null;
-      // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-      isCoin2.notifyListeners();
-    }
-  }
-
   Future<void> swap() async {
 
     print("swap");
 
     try {
 
-      // Response value = Response(json.encode(map), 200);
-
       dialogLoading(_context!);
 
-      await exchanges![currentIndex.value].swap(swapModel).then( (res) async {
-        
-      });
+      swapModel.withdrawal = Provider.of<SDKProvider>(_context!, listen: false).getSdkImpl.evmAddress;
+
+      await exchanges![currentIndex.value].swap(swapModel);
 
     } catch (e) {
       
@@ -317,5 +304,32 @@ class ExchangeUcImpl<T> {
   //     MaterialPageRoute(builder: (context) => ConfirmSwapExchange( statusNotifier: statusNotifier, swapResModel: lstTx![index!], confirmSwap: swapping, getStatus: getStatus))
   //   );
   // }
+
+
+  void resetState() {
+
+    if (swapModel.amt!.value.isNotEmpty) {
+      swapModel.amt!.value = '';
+      receivedAmt = '';
+      
+      isBtn.value = false;
+      // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
+      receiveingAmt.notifyListeners();
+    }
+
+    if (coin1 != null){
+
+      coin1 = null;
+      // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
+      isCoin1.notifyListeners();
+
+    }
+    if (coin2 != null){
+
+      coin2 = null;
+      // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
+      isCoin2.notifyListeners();
+    }
+  }
 
 }
