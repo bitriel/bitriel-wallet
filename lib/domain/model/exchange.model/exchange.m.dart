@@ -4,6 +4,7 @@ class Exchange {
 
   String? title;
   List<ExchangeCoinI> coins = [];
+  List<ExChangeTxI> tx = [];
   Function getCoins;
   Function rate;
   Function swap;
@@ -15,14 +16,5 @@ class Exchange {
     required this.rate,
     required this.swap
   });
-
-}
-
-abstract class ExchangeCoin<T> {
-
-  String? code;
-  String? coinName;
-  List<T>? network;
-  String? icons;
 
 }

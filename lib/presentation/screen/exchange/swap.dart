@@ -1,10 +1,10 @@
 import 'package:bitriel_wallet/domain/usecases/swap_uc/exchange.uc.impl.dart';
 import 'package:bitriel_wallet/index.dart';
-import 'package:bitriel_wallet/presentation/screen/exchange/swap_exolix_ex/lst_exolix_tx.exchange.dart';
+import 'package:bitriel_wallet/presentation/screen/exchange/status_tx.dart';
 
-class SwapExolicExchange extends StatelessWidget {
+class SwapScreen extends StatelessWidget {
   
-  SwapExolicExchange({super.key});
+  SwapScreen({super.key});
 
   final ExchangeUcImpl _exchangeUcImpl = ExchangeUcImpl();
 
@@ -14,6 +14,8 @@ class SwapExolicExchange extends StatelessWidget {
     _exchangeUcImpl.setContext = context;
 
     _exchangeUcImpl.initExchangeState();
+
+    // _exchangeUcImpl.getTrxHistory();
 
     return Scaffold(
       appBar: AppBar(
@@ -98,6 +100,7 @@ class SwapExolicExchange extends StatelessWidget {
                         ),
                       
                         _getDisplay(context, _exchangeUcImpl),
+
                       ],
                     );
                   }
@@ -347,7 +350,7 @@ class SwapExolicExchange extends StatelessWidget {
                         color: hexaCodeToColor(AppColors.background)
                       ),
                       child: ValueListenableBuilder(
-                        valueListenable: leUCImpl.receiveingAmt,
+                        valueListenable: leUCImpl.isReceiveAmt,
                         builder: (context, receiveingAmt, wg) {
 
                           if (receiveingAmt == true) return const CircularProgressIndicator();
@@ -465,43 +468,6 @@ class SwapExolicExchange extends StatelessWidget {
               ),
             
             ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// dd stand for dropdown
-  Widget _ddTokenButton({Function()? onPressed, required int? i, required ExolixExchangeUCImpl exolixExchangeRepoImpl}){
-    
-    return GestureDetector(
-      onTap: onPressed!,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-      
-          SizedBox(
-            height: 30,
-            width: 30,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(50),
-              child: exolixExchangeRepoImpl.lstLECoin.value[0].image!
-            ),
-          ),
-
-          const SizedBox(width: 5),
-          
-          MyTextConstant(
-            textAlign: TextAlign.start,
-            text: i == 0 ? exolixExchangeRepoImpl.lstLECoin.value[0].title : exolixExchangeRepoImpl.lstLECoin.value[1].title,
-            fontSize: 18,
-            color2: hexaCodeToColor("#949393"),
-          ),
-      
-          const Icon(
-            Iconsax.arrow_down_1,
-            size: 20
           ),
         ],
       ),

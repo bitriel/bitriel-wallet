@@ -1,3 +1,4 @@
+import 'package:bitriel_wallet/domain/usecases/swap_uc/exchange.i.dart';
 import 'package:bitriel_wallet/domain/usecases/swap_uc/exchange.uc.impl.dart';
 import 'package:bitriel_wallet/index.dart';
 
@@ -17,13 +18,56 @@ class StatusExolixExchange extends StatelessWidget {
         body: Column(
           children: [
     
-    
-            const TabBar(
-              tabs: [
+            TabBar(
+              onTap: exchangeUcImpl?.onChangedTabBar,
+              tabs: const [
                 Tab(text: "Exolix",),
                 Tab(text: "LetsExchange",)
               ]
             ),
+            
+            ValueListenableBuilder(
+              valueListenable: exchangeUcImpl!.tabBarIndex,
+              builder: (context, tabBarIndex, wg) {
+
+                return ListView(
+                  shrinkWrap: true,
+                  children: exchangeUcImpl!.exchanges![tabBarIndex].tx.reversed.map((e) {
+                    return _statusSwapRes(
+                      exchangeUcImpl: exchangeUcImpl!,
+                      lstTx: exchangeUcImpl!.exchanges![tabBarIndex].tx,
+                      index: exchangeUcImpl!.exchanges![tabBarIndex].tx.indexOf(e) 
+                    );
+                  }).toList(),
+                );
+              }
+            )
+            // TabBarView(
+            //   children: [
+
+            //     ListView(
+            //       shrinkWrap: true,
+            //       children: exchangeUcImpl!.exchanges![exchangeUcImpl!.currentIndex.value].tx.reversed.map((e) {
+            //         return _statusSwapRes(
+            //           exchangeUcImpl: exchangeUcImpl!,
+            //           lstTx: exchangeUcImpl!.exchanges![exchangeUcImpl!.currentIndex.value].tx,
+            //           index: exchangeUcImpl!.exchanges![exchangeUcImpl!.currentIndex.value].tx.indexOf(e) 
+            //         );
+            //       }).toList(),
+            //     ),
+            //     ListView(
+            //       shrinkWrap: true,
+            //       children: exchangeUcImpl!.exchanges![exchangeUcImpl!.tabBarIndex].tx.reversed.map((e) {
+            //         return _statusSwapRes(
+            //           exchangeUcImpl: exchangeUcImpl!,
+            //           lstTx: exchangeUcImpl!.exchanges![exchangeUcImpl!.currentIndex].tx,
+            //           index: exchangeUcImpl!.exchanges![exchangeUcImpl!.currentIndex].tx.indexOf(e) 
+            //         );
+            //       }).toList(),
+            //     )
+
+            //   ]
+            // )
     
             // ValueListenableBuilder(
             //   valueListenable: exchangeUcImpl!.isReady,
@@ -77,13 +121,18 @@ class StatusExolixExchange extends StatelessWidget {
             //       )
             //     );
                 
-            //     return ListView(
+            //     return 
+            // ListView(
             //       shrinkWrap: true,
-            //       children: exchangeUcImpl!.lstTx!.reversed.map((e) {
-            //         return _statusSwapRes(exolixExchangeUCImpl: exolixExchangeUCImpl!, index: exolixExchangeUCImpl!.lstTx!.indexOf(e));
+            //       children: exchangeUcImpl!.exchanges![exchangeUcImpl!.currentIndex.value].tx.reversed.map((e) {
+            //         return _statusSwapRes(
+            //           exchangeUcImpl: exchangeUcImpl!,
+            //           lstTx: exchangeUcImpl!.exchanges![exchangeUcImpl!.currentIndex.value].tx,
+            //           index: exchangeUcImpl!.exchanges![exchangeUcImpl!.currentIndex.value].tx.indexOf(e) 
+            //         );
             //       }).toList(),
-            //     );
-            //   }
+            //     )
+              // }
             // )
     
           ],
@@ -92,21 +141,21 @@ class StatusExolixExchange extends StatelessWidget {
     );
   }
 
-  Widget _statusSwapRes({required ExolixExchangeUCImpl exolixExchangeUCImpl, int? index}) {
+  Widget _statusSwapRes({required ExchangeUcImpl exchangeUcImpl, required List<ExChangeTxI> lstTx, int? index}) {
     
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
       child: ListTile(
         onTap: () {
-          exolixExchangeUCImpl.exolixConfirmSwap(index);
+          exchangeUcImpl.confirmSwap(index);
         },
         title: MyTextConstant(
-          text: "Exchange ID: ${exolixExchangeUCImpl.lstTx![index!].id}",
+          text: "Exchange ID: ${lstTx[index!].id}",
           fontWeight: FontWeight.bold,
           textAlign: TextAlign.start,
         ),
         subtitle: MyTextConstant(
-          text: "Status: ${tzToDateTime(exolixExchangeUCImpl.lstTx![index].createdAt!)}",
+          text: "Status: ${tzToDateTime(lstTx[index].createdAt!)}",
           color2: hexaCodeToColor(AppColors.iconGreyColor),
           textAlign: TextAlign.start,
         ),
@@ -115,7 +164,7 @@ class StatusExolixExchange extends StatelessWidget {
           builder: (context, statusNotifier, wg) {
 
             return MyTextConstant(
-              text: "Status: ${exolixExchangeUCImpl.lstTx![index].status}",
+              text: "Status: ${lstTx[index].status!.value}",
               color2: hexaCodeToColor(AppColors.primary),
               textAlign: TextAlign.end,
             );

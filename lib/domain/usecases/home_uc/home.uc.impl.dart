@@ -17,7 +17,7 @@ class HomeUcImpl implements HomeUsecase {
     Navigator.push(
       context!,
       // MaterialPageRoute(builder: (builder) => SwapExchange())
-      MaterialPageRoute(builder: (builder) => SwapExolicExchange())
+      MaterialPageRoute(builder: (builder) => SwapScreen())
     );
 
     // await showDialog(

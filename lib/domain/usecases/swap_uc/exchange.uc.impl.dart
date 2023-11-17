@@ -1,6 +1,7 @@
 import 'package:bitriel_wallet/domain/model/exchange.model/exchange.m.dart';
 import 'package:bitriel_wallet/domain/usecases/swap_uc/exchange.i.dart';
 import 'package:bitriel_wallet/index.dart';
+import 'package:bitriel_wallet/presentation/screen/exchange/confirm_swap.dart';
 
 class ExchangeUcImpl<T> {
 
@@ -12,12 +13,13 @@ class ExchangeUcImpl<T> {
   // Notifier Field
   ValueNotifier<int> currentIndex = ValueNotifier(0);
   ValueNotifier<bool> isExchangeStateReady = ValueNotifier(false);
+  ValueNotifier<int> tabBarIndex = ValueNotifier(0);
   
   ValueNotifier<bool> isReady = ValueNotifier(false);
   ValueNotifier<bool> isBtn = ValueNotifier(false);
 
   ValueNotifier<bool> statusNotifier = ValueNotifier(false);
-  ValueNotifier<bool> receiveingAmt = ValueNotifier(false);
+  ValueNotifier<bool> isReceiveAmt = ValueNotifier(false);
   String receivedAmt = "";
 
   // Instance Variable
@@ -33,9 +35,10 @@ class ExchangeUcImpl<T> {
 
   // defaultLstCoins
   List<ExchangeCoinI>? defaultLstCoins;
-  List<T>? lstTx;
 
   SwapModel swapModel = SwapModel();
+
+  int index = -1;
 
   set setContext(BuildContext ctx){
     exolicUCImpl.setContext = ctx;
@@ -66,6 +69,10 @@ class ExchangeUcImpl<T> {
     resetState();
   }
 
+  void onChangedTabBar(int index){
+    tabBarIndex.value = index;
+  }
+
   Future<void> getExchangeCoins() async {
 
     if (exchanges![currentIndex.value].coins.isEmpty){
@@ -76,38 +83,42 @@ class ExchangeUcImpl<T> {
 
   }
 
-  Future<void> getTrxHistory() async {
-    
-    // if(defaultLstCoins == null){
-    // }
+  // Future<void> getTrxHistory() async {
 
-    // if (lstTx == null){
+  //   print("getTrxHistory");
 
-    //   await _secureStorageImpl.readSecure(DbKey.lstExolicTxIds_key)!.then( (localLstTx){
+  //   if (exchanges![currentIndex.value].tx.isEmpty){
 
-    //     lstTx?.clear();
+  //     await _secureStorageImpl.readSecure(DbKey.lstExolicTxIds_key)!.then( (localLstTx){
 
-    //     // ignore: unnecessary_null_comparison
-    //     if (localLstTx.isNotEmpty){
+  //       exolicUCImpl.lstTx = json.decode(localLstTx);
 
-    //       // lstTx = List<Map<String, dynamic>>.from((json.decode(localLstTx))).map((e) {
-    //       //   return ExolixSwapResModel.fromJson(e);
-    //       // }).toList();
-    //     }
+  //       exchanges![currentIndex.value].tx = exolicUCImpl.lstTx!.map((e) {
+  //         return exchanges![currentIndex.value].tx
+  //       });
+
+  //   //     lstTx?.clear();
+
+  //   //     // ignore: unnecessary_null_comparison
+  //   //     if (localLstTx.isNotEmpty){
+
+  //   //       // lstTx = List<Map<String, dynamic>>.from((json.decode(localLstTx))).map((e) {
+  //   //       //   return ExolixSwapResModel.fromJson(e);
+  //   //       // }).toList();
+  //   //     }
         
-    //     // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-    //     isReady.value = true;
+  //   //     // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
+  //   //     isReady.value = true;
 
-    //   });
-    // }
+  //     });
+      
+  //   }
     
-  }
+  // }
 
   void queryEstimateAmt() {
 
-    print("queryEstimateAmt");
-
-    if (receiveingAmt.value == false) receiveingAmt.value = true;
+    if (isReceiveAmt.value == false) isReceiveAmt.value = true;
 
     EasyDebounce.debounce("queryEstimateAmt", const Duration(milliseconds: 800), () async {
 
@@ -115,22 +126,7 @@ class ExchangeUcImpl<T> {
 
         receivedAmt = (await exchanges![currentIndex.value].rate(coin1!, coin2!, swapModel)).toString();
 
-        receiveingAmt.value = false;
-        // EasyDebounce.debounce("queryEstimateAmt", const Duration(milliseconds: 500), () async {
-
-        //   await exolicUCImpl.rate({
-        //     "coinFrom": swapModel.coinFrom,
-        //     "coinTo": swapModel.coinTo,
-        //     "coinFromNetwork": swapModel.networkFrom,
-        //     "coinToNetwork": swapModel.networkTo,
-        //     "amount": swapModel.amt!.value,
-        //     "rateType": "fixed"
-        //   }).then((value) {
-
-        //     if (value.statusCode == 200) {
-        //       // receivedAmt.value = (json.decode(value.body))['toAmount'].toString();
-        //     }
-        //   });
+        isReceiveAmt.value = false;
         
       }
     });
@@ -168,21 +164,7 @@ class ExchangeUcImpl<T> {
           swapModel.networkTo = coin2!.network;
           // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
           isCoin2.notifyListeners();
-          
-        //   coin2.value = lstLECoin.value[res];
-        //   swapModel.coinTo = coin2.value.title;
-        //   swapModel.networkTo = coin2.value.networkCode;
         }
-
-        // swapModel.withdrawalAddress = Provider.of<SDKProvider>(context, listen: false).getSdkImpl.evmAddress;
-        
-        // queryEstimateAmt();
-        
-        // if (Validator.swapValidator(swapModel.coinFrom!, swapModel.coinTo!, swapModel.amt!.value) == true){
-        //   isReady.value = true;
-        // } else if (isReady.value == false) {
-        //   isReady.value = false;
-        // }
         
       }
     });
@@ -261,8 +243,13 @@ class ExchangeUcImpl<T> {
       dialogLoading(_context!);
 
       swapModel.withdrawal = Provider.of<SDKProvider>(_context!, listen: false).getSdkImpl.evmAddress;
+      await exchanges![currentIndex.value].swap(swapModel).then( (ExChangeTxI res){
+        print(res.id);
+        exchanges![currentIndex.value].tx.add( res );
+      });
 
-      await exchanges![currentIndex.value].swap(swapModel);
+      // Close Dialog
+      Navigator.pop(_context!);
 
     } catch (e) {
       
@@ -296,15 +283,24 @@ class ExchangeUcImpl<T> {
 
   // }
 
-  // @override
-  // Future<void> confirmSwap(int indx) async {
-  //   index = indx;
-  //   Navigator.push(
-  //     _context!,
-  //     MaterialPageRoute(builder: (context) => ConfirmSwapExchange( statusNotifier: statusNotifier, swapResModel: lstTx![index!], confirmSwap: swapping, getStatus: getStatus))
-  //   );
-  // }
+  Future<void> confirmSwap(int indx) async {
+    index = indx;
+    Navigator.push(
+      _context!,
+      MaterialPageRoute(builder: (context) => ConfirmSwapExchange(
+        statusNotifier: statusNotifier, 
+        exChangeTxI: exchanges![tabBarIndex.value].tx[index], 
+        confirmSwap: swapping, 
+        getStatus: getStatus
+      ))
+    );
+  }
 
+  void swapping(){}
+
+  Future<void> getStatus() async {
+
+  }
 
   void resetState() {
 
@@ -314,7 +310,7 @@ class ExchangeUcImpl<T> {
       
       isBtn.value = false;
       // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-      receiveingAmt.notifyListeners();
+      isReceiveAmt.notifyListeners();
     }
 
     if (coin1 != null){

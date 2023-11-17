@@ -1,30 +1,17 @@
 import 'package:bitriel_wallet/domain/usecases/swap_uc/exchange.i.dart';
 import 'package:bitriel_wallet/index.dart';
 
-class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI {
+class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExChangeTxI {
 
   BuildContext? _context;
-  
-  /// Data Of Coin 1
-  ValueNotifier<LetsExCoinByNetworkModel> coin1 = ValueNotifier(LetsExCoinByNetworkModel());
-  /// Data Of Coin 2
-  ValueNotifier<LetsExCoinByNetworkModel> coin2 = ValueNotifier(LetsExCoinByNetworkModel());
-  
-  ValueNotifier<bool> isLstCoinReady = ValueNotifier(false);
-
-  ValueNotifier<String> receiveAmt = ValueNotifier("");
-
-  final LetsExchangeRepoImpl _letsExchangeRepoImpl = LetsExchangeRepoImpl();
 
   List<Map<String, dynamic>> defaultLstCoins = [];
 
-  Widget? imgConversion;
+  final LetsExchangeRepoImpl _letsExchangeRepoImpl = LetsExchangeRepoImpl();
 
   final PaymentUcImpl _paymentUcImpl = PaymentUcImpl();
 
-  ValueNotifier<List<LetsExCoinByNetworkModel>> lstLECoin = ValueNotifier([]);
-
-  List<SwapResModel>? lstTx = [];
+  List<Map<String, dynamic>>? lstTx = [];
   
   ValueNotifier<bool> statusNotifier = ValueNotifier(false);
 
@@ -32,22 +19,65 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI {
 
   int? index;
 
-  ValueNotifier<bool> isReady = ValueNotifier(false);
-
   set setContext(BuildContext ctx){
     _context = ctx;
     _paymentUcImpl.setBuildContext = ctx;
   }
 
-  final SecureStorageImpl _secureStorageImpl = SecureStorageImpl();
-
-  // SwapModel swapModel = SwapModel();
   @override
   String? code, coinName, network, networkName, shortName, icon;
-  
   LetsExchangeUCImpl();
-  
   LetsExchangeUCImpl.mapping({this.code, this.coinName, this.network, this.networkName, this.icon, this.shortName});
+
+  @override
+  String? id, coinFrom ,coinFromNetwork ,coinFromIcon, coinFromNetworkName ,coinTo, coinToNetworkName ,coinToNetwork ,coinToIcon ,depositAddr ,depositAmt ,withdrawalAddress ,createdAt ,withdrawalAmount;
+  @override
+  ValueNotifier<String>? status;
+  LetsExchangeUCImpl.txMapping({
+    required this.id,
+    required this.coinFrom,
+    required this.coinFromNetwork,
+    required this.coinFromNetworkName,
+    required this.coinFromIcon,
+
+    required this.coinTo,
+    required this.coinToNetwork,
+    required this.coinToNetworkName,
+    required this.coinToIcon,
+
+    required this.depositAddr,
+    required this.depositAmt,
+    required this.withdrawalAddress,
+    required this.createdAt,
+    required this.status,
+    required this.withdrawalAmount,
+  });
+
+  ExChangeTxI fromJson(Map<String, dynamic> jsn){
+    return LetsExchangeUCImpl.txMapping(
+      id: jsn['transaction_id'],
+
+      coinFrom: jsn['coin_from'],
+      coinFromNetwork: jsn['coin_from_network'],
+      coinFromNetworkName: jsn['coin_from_name'],
+      coinFromIcon: jsn['coin_from_icon'],
+
+      coinTo: jsn['coin_to'],
+      coinToNetwork: jsn['coin_to_network'],
+      coinToNetworkName: jsn['coin_to_name'] ?? '',
+      coinToIcon: jsn['coin_to_icon'],
+
+      depositAddr: jsn['deposit'],
+      depositAmt: jsn['deposit_amt'],
+
+      status: ValueNotifier(jsn['status']),
+      withdrawalAmount: jsn['withdrawal_amount'].toString(),
+
+      withdrawalAddress: jsn['withdrawal'],
+      createdAt: jsn['created_at'],
+
+    );
+  }
 
   @override
   Future<List<ExchangeCoinI>> getCoins() async {
@@ -70,24 +100,6 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI {
           );
         })
       );
-      
-      // List<Map<String, dynamic>>.from(element['networks']).every((e) {
-
-      //   code = element['code'];
-      //   coinName = element['name'];
-      //   icon = element['icon'];
-      //   network = e['network'];
-      //   networkName = e['name'];
-
-      //   filteredCoins.add(this);
-
-      //   return true;
-        
-      // });
-    }
-
-    for (var element in filteredCoins) {
-      print("Element ${element.coinName}");
     }
 
     return filteredCoins;
@@ -99,77 +111,12 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI {
 
     defaultLstCoins = await _letsExchangeRepoImpl.getLetsExchangeCoin();
 
-    lstCoinExtract();
-
     return defaultLstCoins as List<T>;
     
-  }
-  
-  void lstCoinExtract() {
-
-    // for(int i = 0; i < defaultLstCoins.length; i++){
-
-    //   for (int j = 0; j < defaultLstCoins[i].networks!.length; j++){
-    //     addCoinByIndex(i, j);
-    //   }
-
-    // }
-
-    // isLstCoinReady.value = true;
-    
-  }
-
-  void addCoinByIndex(int i, int j) {
-
-    if (defaultLstCoins[i]['icon'] != null){
-
-    //   if (lstCoins![i]['icon'].contains('svg')){
-    //     imgConversion = SvgPicture.network(lstCoins![i]['icon'], width: 10);
-    //   } else if (lstCoins![i]['icon'] != null){
-    //     imgConversion = Image.network(lstCoins![i]['icon'], width: 10);
-    //   }
-    // }
-    // // Null 
-    // else {
-    //   imgConversion = CircleAvatar(child: Container(width: 10, height: 10, color: Colors.green,),);
-    }
-
-    if (
-      defaultLstCoins[i]['network']![j].code == "BTC" ||
-      defaultLstCoins[i]['network']![j].code == "BEP20" ||
-      defaultLstCoins[i]['network']![j].code == "ERC20" ||
-      defaultLstCoins[i]['network']![j].code == "Ethereum" ||
-      defaultLstCoins[i]['network']![j].code == "Binance Chain"
-    ){
-      
-      // ExolixExchangeUCImpl.mapping({this.code, this.coinName, this.network, this.networkName, this.icon, this.shortName});
-
-      // lstLECoin.value.add(
-      //   LetsExCoinByNetworkModel(
-      //     title: defaultLstCoins[i]['code'],
-      //     subtitle: defaultLstCoins[i]['name'],
-      //     // isActive: index2 == i ? true : false,
-      //     image: Container(),//imgConversion!,
-      //     network: defaultLstCoins[i]['network'][j].name!,
-      //     networkCode: defaultLstCoins[i]['network'][j].code,
-      //     balance: "0"//contractProvider!.sortListContract[i].balance,
-          
-      //   )
-      // );
-    }
-
   }
 
   @override
   Future<String> rate(ExchangeCoinI coin1, ExchangeCoinI coin2, SwapModel swapModel) async {
-
-    // print({
-    //   "from": swapModel.from,
-    //   "to": swapModel.to,
-    //   "network_from": swapModel.networkFrom,
-    //   "network_to": swapModel.networkTo,
-    //   "amount": swapModel.amt!.value
-    // });
 
     return await _letsExchangeRepoImpl.twoCoinInfo({
       "from": coin1.code,
@@ -182,13 +129,9 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI {
   }
 
   @override
-  Future<void> letsExchangeSwap(SwapModel swapModel) async {
-    print("swapModel.toJson() ${swapModel.toJson()}");
+  Future<ExChangeTxI> letsExchangeSwap(SwapModel swapModel) async {
 
-    await _letsExchangeRepoImpl.swap(swapModel.toJson()).then((value) async {
-
-      print("statusCode ${value.statusCode}");
-      print("value ${value.body}");
+    return await _letsExchangeRepoImpl.swap(swapModel.toJson()).then((value) async {
         
       if (value.statusCode == 401){
         throw json.decode(value.body)['error'];
@@ -203,12 +146,26 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI {
 
       else if (value.statusCode == 200) {
 
-        lstTx!.add(SwapResModel.fromJson(json.decode(value.body)));
-        
-        await SecureStorageImpl().writeSecure(DbKey.lstTxIds, json.encode(SwapResModel().toJson(lstTx!)));
+        // tx = ExolixExchangeUCImpl.txMapping(
+        //   id: jsn['transaction_id'],
+        //   coinFrom: jsn['coin_from'],
+        //   coinFromNetwork: jsn['coin_from_network'],
+        //   coinFromIcon: jsn['coin_from_icon'],
+        //   coinTo: jsn['coin_to'],
+        //   coinToNetwork: jsn['coin_to_network'],
+        //   coinToIcon: jsn['coin_to_icon'],
+        //   deposit: jsn['deposit'],
+        //   depositAmt: jsn['deposit_amt'],
+        //   withdrawal: jsn['withdrawal'],
+        //   createdAt: jsn['created_at'],
+        //   status: ValueNotifier(jsn['status']),
+        //   withdrawalAmount: jsn['withdrawal_amount'].toString(),
+        // );
 
-        // Close Dialog
-        Navigator.pop(_context!);
+        // lstTx!.add(SwapResModel.fromJson(jsn));
+        lstTx!.add(json.decode(value.body));
+        
+        await SecureStorageImpl().writeSecure(DbKey.lstTxIds, json.encode(lstTx!));
 
         await QuickAlert.show(
           context: _context!,
@@ -223,6 +180,8 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI {
           },
         );
 
+        return fromJson(json.decode(value.body));
+        
       } else {
         throw json.decode(value.body);
       }
@@ -238,8 +197,8 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI {
       MaterialPageRoute(builder: (context) => const PincodeScreen(title: '', label: PinCodeLabel.fromSendTx,))
     ).then((value) async {
 
-      _paymentUcImpl.recipientController.text = lstTx![index].deposit!;
-      _paymentUcImpl.amountController.text = lstTx![index].deposit_amount!;
+      // _paymentUcImpl.recipientController.text = lstTx![index].deposit!;
+      // _paymentUcImpl.amountController.text = lstTx![index].deposit_amount!;
 
       if (value != null){
         await _paymentUcImpl.sendBep20();
@@ -250,11 +209,11 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI {
 
   @override
   Future<void> confirmSwap(int indx) async {
-    index = indx;
-    Navigator.push(
-      _context!,
-      MaterialPageRoute(builder: (context) => ConfirmSwapExchange( statusNotifier: statusNotifier, swapResModel: lstTx![index!], confirmSwap: swapping, getStatus: getStatus))
-    );
+    // index = indx;
+    // Navigator.push(
+    //   _context!,
+    //   MaterialPageRoute(builder: (context) => ConfirmSwapExchange( statusNotifier: statusNotifier, swapResModel: lstTx![index!], confirmSwap: swapping, getStatus: getStatus))
+    // );
   }
 
   @override
@@ -263,7 +222,6 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI {
     int index = Provider.of<WalletProvider>(_context!, listen: false).sortListContract!.indexWhere((model) {
       
       if ( swapResModel.coin_from!.toLowerCase() == model.symbol!.toLowerCase() ){
-        isReady.value = true;
         return true;
       }
 
@@ -302,20 +260,21 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI {
   /// This function for update status inside details
   Future<SwapResModel> getStatus() async {
     
-    dialogLoading(_context!, content: "Checking Status");
+    // dialogLoading(_context!, content: "Checking Status");
 
-    await _letsExchangeRepoImpl.getLetsExStatusByTxId(lstTx![index!].transaction_id!).then((value) {
+    // await _letsExchangeRepoImpl.getLetsExStatusByTxId(lstTx![index!].transaction_id!).then((value) {
       
-      lstTx![index!] = SwapResModel.fromJson(json.decode(value.body));
+    //   lstTx![index!] = SwapResModel.fromJson(jsn);
 
-    });
+    // });
 
-    await SecureStorageImpl().writeSecure(DbKey.lstTxIds, json.encode(SwapResModel().toJson(lstTx!)));
+    // await SecureStorageImpl().writeSecure(DbKey.lstTxIds, json.encode(SwapResModel().toJson(lstTx!)));
 
-    // Close Dialog
-    Navigator.pop(_context!);
+    // // Close Dialog
+    // Navigator.pop(_context!);
 
-    return lstTx![index!];
+    // return lstTx![index!];
+    return SwapResModel();
   }
 
 }

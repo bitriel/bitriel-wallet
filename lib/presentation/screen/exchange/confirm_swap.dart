@@ -1,37 +1,39 @@
+import 'package:bitriel_wallet/domain/usecases/swap_uc/exchange.i.dart';
 import 'package:bitriel_wallet/index.dart';
 
 class ConfirmSwapExchange extends StatelessWidget {
 
   final ValueNotifier<bool>? statusNotifier;
 
-  final SwapResModel? swapResModel;
+  final ExChangeTxI? exChangeTxI;
 
   final Function? confirmSwap;
 
   final Function? getStatus;
   
-  const ConfirmSwapExchange({required this.statusNotifier, super.key, required this.swapResModel, required this.confirmSwap, this.getStatus});
+  const ConfirmSwapExchange({required this.statusNotifier, super.key, required this.exChangeTxI, required this.confirmSwap, this.getStatus});
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: appBar(context, title: "Swap"),
       body: Column(
         children: [
       
-          _swapTokenInfo(swapResModel),
+          _swapTokenInfo(exChangeTxI),
 
-          _trxExchangeInfo(context, swapResModel, getStatus!),
+          _trxExchangeInfo(context, exChangeTxI, getStatus!),
 
           Expanded(
             child: Container()
           ),
 
-          swapResModel!.status!.toLowerCase() != "success" ? MyButton(
+          exChangeTxI!.status!.value.toLowerCase() != "success" ? MyButton(
             edgeMargin: const EdgeInsets.all(paddingSize),
             textButton: "Confirm",
             action: () {
-              confirmSwap!(swapResModel);
+              confirmSwap!(exChangeTxI);
             },
           ) : const SizedBox(),
       
@@ -40,7 +42,7 @@ class ConfirmSwapExchange extends StatelessWidget {
     );
   }
 
-  Widget _swapTokenInfo(SwapResModel? swapResModel) {
+  Widget _swapTokenInfo(ExChangeTxI? exChangeTxI) {
     return Padding(
       padding: const EdgeInsets.all(15),
       child: Column(
@@ -68,10 +70,29 @@ class ConfirmSwapExchange extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
           
-                    MyTextConstant(
-                      text: "${swapResModel!.deposit_amount} ${swapResModel.coin_from}",
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
+                    Row(
+                      children: [
+
+                        MyTextConstant(
+                          text: "${exChangeTxI!.depositAmt} ${exChangeTxI.coinFromNetwork}",
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+
+                        Container(
+                          margin: const EdgeInsets.only(left: 10),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.cyanAccent
+                          ),
+                          child: MyTextConstant(
+                            text: "${exChangeTxI.coinFromNetworkName}",
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     )
                   ],
                 )
@@ -110,10 +131,36 @@ class ConfirmSwapExchange extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
           
-                    MyTextConstant(
-                      text: swapResModel.withdrawal_amount,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
+                    
+                    Row(
+                      children: [
+
+                        MyTextConstant(
+                          text: exChangeTxI.withdrawalAmount,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+
+                        MyTextConstant(
+                          text: "${exChangeTxI.withdrawalAmount} ${exChangeTxI.coinFromNetwork}",
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+
+                        Container(
+                          margin: const EdgeInsets.only(left: 10),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.cyanAccent
+                          ),
+                          child: MyTextConstant(
+                            text: "${exChangeTxI.coinToNetworkName}",
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     )
                   ],
                 )
@@ -126,7 +173,7 @@ class ConfirmSwapExchange extends StatelessWidget {
     );
   }
 
-  Widget _trxExchangeInfo(BuildContext context, SwapResModel? swapResModel, Function getStatus) {
+  Widget _trxExchangeInfo(BuildContext context, ExChangeTxI? exChangeTxI, Function getStatus) {
     return Padding(
       padding: const EdgeInsets.all(15),
       child: Column(
@@ -153,7 +200,7 @@ class ConfirmSwapExchange extends StatelessWidget {
                     const Spacer(),
             
                     MyTextConstant(
-                      text: swapResModel!.withdrawal!.replaceRange(6, swapResModel.withdrawal!.length - 6, "......."),
+                      text: exChangeTxI!.withdrawalAddress!.replaceRange(6, exChangeTxI.withdrawalAddress!.length - 6, "......."),
                       fontWeight: FontWeight.w600,
                     ),
                     
@@ -161,7 +208,7 @@ class ConfirmSwapExchange extends StatelessWidget {
                       icon: Icon(Iconsax.copy, color: hexaCodeToColor(AppColors.primary), size: 20),
                       onPressed: () async {
                         Clipboard.setData(
-                          ClipboardData(text: swapResModel!.deposit!.replaceRange(6, swapResModel!.deposit!.length - 6, ".......")),
+                          ClipboardData(text: exChangeTxI!.depositAddr!.replaceRange(6, exChangeTxI!.depositAddr!.length - 6, ".......")),
                         );
                         /* Copy Text */
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -187,7 +234,7 @@ class ConfirmSwapExchange extends StatelessWidget {
                     const Spacer(),
             
                     MyTextConstant(
-                      text: swapResModel.deposit!.replaceRange(6, swapResModel.deposit!.length - 6, "......."),
+                      text: exChangeTxI.depositAddr!.replaceRange(6, exChangeTxI.depositAddr!.length - 6, "......."),
                       fontWeight: FontWeight.w600,
                     ),
                     
@@ -195,7 +242,7 @@ class ConfirmSwapExchange extends StatelessWidget {
                       icon: Icon(Iconsax.copy, color: hexaCodeToColor(AppColors.primary), size: 20),
                       onPressed: () async {
                         Clipboard.setData(
-                          ClipboardData(text: swapResModel!.deposit!),
+                          ClipboardData(text: exChangeTxI!.depositAddr!),
                         );
                         /* Copy Text */
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -223,7 +270,7 @@ class ConfirmSwapExchange extends StatelessWidget {
                       const Spacer(),
                             
                       const MyTextConstant(
-                        text: "LetsExchange.io",
+                        text: "Exolix.com",
                         fontWeight: FontWeight.w600,
                       ),
                     
@@ -242,7 +289,7 @@ class ConfirmSwapExchange extends StatelessWidget {
           InkWell(
             onTap: () {
               Clipboard.setData(
-                ClipboardData(text: swapResModel!.transaction_id!),
+                ClipboardData(text: exChangeTxI!.id!),
               );
               /* Copy Text */
               ScaffoldMessenger.of(context).showSnackBar(
@@ -279,7 +326,7 @@ class ConfirmSwapExchange extends StatelessWidget {
                             const SizedBox(height: 2.5,),
                             
                             MyTextConstant(
-                              text: "${swapResModel.transaction_id}",
+                              text: "${exChangeTxI.id}",
                               color2: hexaCodeToColor(AppColors.primary),
                               textAlign: TextAlign.start,
                               fontWeight: FontWeight.bold,
@@ -309,8 +356,9 @@ class ConfirmSwapExchange extends StatelessWidget {
                               valueListenable: statusNotifier!,
                               builder: (context, statusNotifier, wg) {
                                 
+                                print("statusNotifier $statusNotifier");
                                 return MyTextConstant(
-                                  text: "Status: ${swapResModel!.status}",
+                                  text: "Status: ${exChangeTxI!.status}",
                                   color2: hexaCodeToColor(AppColors.primary),
                                   textAlign: TextAlign.end,
                                 );
@@ -326,16 +374,8 @@ class ConfirmSwapExchange extends StatelessWidget {
                       IconButton(
                         icon: Icon(Iconsax.refresh_circle, color: hexaCodeToColor(AppColors.orangeColor)),
                         onPressed: () async {
-                          // Clipboard.setData(
-                          //   ClipboardData(text: swapResModel.deposit!),
-                          // );
-                          // /* Copy Text */
-                          // ScaffoldMessenger.of(context).showSnackBar(
-                          //   const SnackBar(
-                          //     content: Text("To Address is Copied to Clipboard"),
-                          //   ),
-                          // );
-                          swapResModel = await getStatus();
+
+                          exChangeTxI = await getStatus();
 
                           // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
                           statusNotifier!.notifyListeners();
