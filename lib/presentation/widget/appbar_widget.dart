@@ -264,30 +264,32 @@ PreferredSizeWidget defaultAppBar({
                 ),
               ),
 
-              multiAccountImpl.getAllAccount.length == 2 ? const SizedBox() : MyButton(
-                edgeMargin: const EdgeInsets.all(15),
-                textButton: "Add Account",
-                fontWeight: FontWeight.w600,
-                action: () async {
-
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      settings: RouteSettings(name: "/${BitrielRouter.multiAccRoute}"),
-                      builder: (context) => const MultiAccountScreen()
-                    ) 
-                  );
-                  
-                  setState((){
-                    currentIndex = multiAccountImpl.getAllAccount.indexWhere((element) {
-                      if (multiAccountImpl.getAccount.address == element.address){
-                        return true;
-                      }
-                      return false;
+              multiAccountImpl.getAllAccount.length == 2 ? const SizedBox() : SafeArea(
+                child: MyButton(
+                  edgeMargin: const EdgeInsets.all(15),
+                  textButton: "Add Account",
+                  fontWeight: FontWeight.w600,
+                  action: () async {
+              
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        settings: RouteSettings(name: "/${BitrielRouter.multiAccRoute}"),
+                        builder: (context) => const MultiAccountScreen()
+                      ) 
+                    );
+                    
+                    setState((){
+                      currentIndex = multiAccountImpl.getAllAccount.indexWhere((element) {
+                        if (multiAccountImpl.getAccount.address == element.address){
+                          return true;
+                        }
+                        return false;
+                      });
                     });
-                  });
-
-                },
+              
+                  },
+                ),
               ),
 
             ],

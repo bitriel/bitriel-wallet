@@ -176,14 +176,14 @@ Future<void> seedVerifyLaterDialog(BuildContext context, Function? submit) async
           
                 const SizedBox(height: 10,),
           
-                MyButton(
-                  textButton: "No, Verify Now",
-                  action: (){
-                    Navigator.pop(context);
-                  }
+                SafeArea(
+                  child: MyButton(
+                    textButton: "No, Verify Now",
+                    action: (){
+                      Navigator.pop(context);
+                    }
+                  ),
                 ),
-
-                const SizedBox(height: 10,),
           
               ],
             ),

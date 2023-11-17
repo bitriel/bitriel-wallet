@@ -228,8 +228,8 @@ class PincodeScreenState extends State<PincodeScreen> {
             const SizedBox(height: 20),
             ReuseNumPad(startNumber: 7, pinIndexSetup: pinUsecaseImpl.setPin, clearPin: pinUsecaseImpl.clearPin),
             const SizedBox(height: 20),
-            ReuseNumPad(startNumber: 0, pinIndexSetup: pinUsecaseImpl.setPin, clearPin: pinUsecaseImpl.clearPin),
-            const SizedBox(height: 19),
+            SafeArea(child: ReuseNumPad(startNumber: 0, pinIndexSetup: pinUsecaseImpl.setPin, clearPin: pinUsecaseImpl.clearPin)),
+            const SizedBox(height: 20),
           ],
         ),
       )

@@ -488,43 +488,45 @@ class WalletInfo extends StatelessWidget {
 
 
   Widget _buyAndsellBtn(BuildContext context, String addr, int assetIndex, String tokenName, String tokenSymbol, String tokenNetwork){
-    return Row(
-      children: [
-
-        Expanded(
-          child: MyButton(
-            edgeMargin: const EdgeInsets.all(10),
-            textButton: "Send",
-            fontWeight: FontWeight.w600,
-            buttonColor: "#ED2727",
-            opacity: 0.9,
-            action: () async {
-
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => TokenPayment(index: assetIndex) )
-              );
-            },
-          ),
-        ),
+    return SafeArea(
+      child: Row(
+        children: [
     
-        Expanded(
-          child: MyButton(
-            edgeMargin: const EdgeInsets.all(10),
-            textButton: "Receive",
-            fontWeight: FontWeight.w600,
-            buttonColor: "#00A478",
-            opacity: 0.9,
-            action: () async {
-              
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ReceiveWallet(addr: addr, tokenName: tokenName, symbol: tokenSymbol, tokenNetwork: tokenNetwork))
-              );
-            },
+          Expanded(
+            child: MyButton(
+              edgeMargin: const EdgeInsets.all(10),
+              textButton: "Send",
+              fontWeight: FontWeight.w600,
+              buttonColor: "#ED2727",
+              opacity: 0.9,
+              action: () async {
+    
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => TokenPayment(index: assetIndex) )
+                );
+              },
+            ),
           ),
-        )
-      ],
+      
+          Expanded(
+            child: MyButton(
+              edgeMargin: const EdgeInsets.all(10),
+              textButton: "Receive",
+              fontWeight: FontWeight.w600,
+              buttonColor: "#00A478",
+              opacity: 0.9,
+              action: () async {
+                
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ReceiveWallet(addr: addr, tokenName: tokenName, symbol: tokenSymbol, tokenNetwork: tokenNetwork))
+                );
+              },
+            ),
+          )
+        ],
+      ),
     );
   }
   

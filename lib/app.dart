@@ -61,8 +61,8 @@ class SplashScreen extends StatelessWidget {
               Lottie.asset(
                 "assets/animation/wallet_splash_screen.json",
                 repeat: true,
-                height: 250,
-                width: 250
+                height: 150,
+                width: 150
               ),
         
               const Padding(

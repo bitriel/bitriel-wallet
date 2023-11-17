@@ -14,6 +14,8 @@ class BackUpWalletScreen extends StatelessWidget{
 
     List<String> words = mnemonicKey.split(" ");
     int wordLength = words.length;
+
+    print("wordLength $wordLength");
      
     return Scaffold(
       appBar: appBar(context, title: "Export Mnemonic"),
@@ -24,7 +26,7 @@ class BackUpWalletScreen extends StatelessWidget{
           children: [
             _warningLabel(),
             
-            Flexible(
+            wordLength == 1 ? _mnemonicEmpty() : Flexible(
               child: GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -46,10 +48,29 @@ class BackUpWalletScreen extends StatelessWidget{
             // _copyButton(context: context, mnemonic: mnemonicKey),
             
 
-            _warningMsg(),
+            SafeArea(child: _warningMsg()),
           ]
         ),
       )
+    );
+  }
+
+  Widget _mnemonicEmpty() {
+    return Column(
+      children: [
+        Lottie.asset(
+          "assets/animation/search_empty.json",
+          repeat: false,
+          height: 200,
+          width: 200
+        ),
+
+        MyTextConstant(
+          text: "Mnemonic not found, You may input wrong passcode.\n Please try again!!!",
+          fontWeight: FontWeight.w600,
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
   
