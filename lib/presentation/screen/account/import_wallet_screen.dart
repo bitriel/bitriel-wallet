@@ -69,16 +69,18 @@ class ImportWalletScreen extends StatelessWidget {
             ),
       
             Expanded(child: Container()),
-            ValueListenableBuilder(
-              valueListenable: importWalletImpl.isSeedValid,
-              builder: (context, value, wg) {
-                return MyButton(
-                  textButton: "Next",
-                  action: value ? () async {
-                    await importWalletImpl.addAndImport(pin!);
-                  } : null,
-                );
-              }
+            SafeArea(
+              child: ValueListenableBuilder(
+                valueListenable: importWalletImpl.isSeedValid,
+                builder: (context, value, wg) {
+                  return MyButton(
+                    textButton: "Next",
+                    action: value ? () async {
+                      await importWalletImpl.addAndImport(pin!);
+                    } : null,
+                  );
+                }
+              ),
             ),
 
           ],

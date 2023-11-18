@@ -154,14 +154,16 @@ class AccountSettingScreen extends StatelessWidget {
                   ),
                 ),
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                  child: MyButton(
-                    textButton: "Continue",
-                    buttonColor: isCheck1 == true && isCheck2 == true && isCheck3 == true ? AppColors.primary : AppColors.lightGrey,
-                    action: (){
-                      if(isCheck1 == true && isCheck2 == true && isCheck3 == true) submit!();
-                    }
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                    child: MyButton(
+                      textButton: "Continue",
+                      buttonColor: isCheck1 == true && isCheck2 == true && isCheck3 == true ? AppColors.primary : AppColors.lightGrey,
+                      action: (){
+                        if(isCheck1 == true && isCheck2 == true && isCheck3 == true) submit!();
+                      }
+                    ),
                   ),
                 ),
             

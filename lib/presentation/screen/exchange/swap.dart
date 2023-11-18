@@ -1,6 +1,8 @@
+import 'package:bitriel_wallet/domain/model/exchange.model/exchange.m.dart';
 import 'package:bitriel_wallet/domain/usecases/swap_uc/exchange.uc.impl.dart';
 import 'package:bitriel_wallet/index.dart';
 import 'package:bitriel_wallet/presentation/screen/exchange/status_tx.dart';
+import 'package:bitriel_wallet/presentation/widget/toggle_animation_widget.dart';
 
 class SwapScreen extends StatelessWidget {
   
@@ -108,27 +110,34 @@ class SwapScreen extends StatelessWidget {
               ),
             ),
 
-            const MyTextConstant(text: "Exchange",),
-            
-            ValueListenableBuilder(
-              valueListenable: _exchangeUcImpl.isExchangeStateReady,
-              builder: (context, isExchangeStateReady, wg) {
-
-                if (isExchangeStateReady == false) return const Center(child: CircularProgressIndicator(),);
-
-                return DropdownButton<int>(
-                  value: _exchangeUcImpl.currentIndex.value,
-                  items: _exchangeUcImpl.exchanges?.map((e) {
-                    return DropdownMenuItem<int>(
-                      onTap: () => _exchangeUcImpl.switchExchange(_exchangeUcImpl.exchanges!.indexOf(e)),
-                      value: _exchangeUcImpl.exchanges!.indexOf(e),
-                      child: MyTextConstant(text: e.title),
-                    );
-                  }).toList() , 
-                  onChanged: _exchangeUcImpl.onDropDownChange
-                );
-              }
+            AnimatedToggle(
+              values: const ["Exolix", "Let's Exchange"],
+              onToggleCallback: _exchangeUcImpl.switchExchange,
+              buttonColor: hexaCodeToColor(AppColors.primaryBtn),
+              backgroundColor: hexaCodeToColor(AppColors.primaryBtn).withOpacity(0.2),
+              textColor: Colors.white,
             ),
+
+            // const MyTextConstant(text: "Exchange",),
+            
+            // ValueListenableBuilder(
+            //   valueListenable: _exchangeUcImpl.isExchangeStateReady,
+            //   builder: (context, isExchangeStateReady, wg) {
+
+            //     if (isExchangeStateReady == false) return const Center(child: CircularProgressIndicator(),);
+            //     return DropdownButton<int>(
+            //       value: _exchangeUcImpl.currentIndex.value,
+            //       items: _exchangeUcImpl.exchanges?.map((e) {
+            //         return DropdownMenuItem<int>(
+            //           onTap: () => _exchangeUcImpl.switchExchange(_exchangeUcImpl.exchanges!.indexOf(e)),
+            //           value: _exchangeUcImpl.exchanges!.indexOf(e),
+            //           child: MyTextConstant(text: e.title),
+            //         );
+            //       }).toList(), 
+            //       onChanged: _exchangeUcImpl.onDropDownChange
+            //     );
+            //   }
+            // ),
 
             Expanded(
               child: Container()
@@ -139,20 +148,22 @@ class SwapScreen extends StatelessWidget {
             ),
 
             // Swap Button
-            ValueListenableBuilder(
-              valueListenable: _exchangeUcImpl.isBtn,
-              builder: (context, isBtn, wg) {
-
-                return MyButton(
-                  edgeMargin: const EdgeInsets.all(paddingSize),
-                  textButton: "Swap",
-                  buttonColor: isBtn == false ? AppColors.greyCode : AppColors.primaryBtn,
-                  action: isBtn == false ? null : 
-                  () async {
-                    await _exchangeUcImpl.swap();
-                  },
-                );
-              }
+            SafeArea(
+              child: ValueListenableBuilder(
+                valueListenable: _exchangeUcImpl.isBtn,
+                builder: (context, isBtn, wg) {
+            
+                  return MyButton(
+                    edgeMargin: const EdgeInsets.all(paddingSize),
+                    textButton: "Swap",
+                    buttonColor: isBtn == false ? AppColors.greyCode : AppColors.primaryBtn,
+                    action: isBtn == false ? null : 
+                    () async {
+                      await _exchangeUcImpl.swap();
+                    },
+                  );
+                }
+              ),
             ),
       
           ],
@@ -242,7 +253,6 @@ class SwapScreen extends StatelessWidget {
                   
                   : InkWell(
                     onTap: (){
-
                       if (isReady == true) leUCImpl.setCoin(context, true);
                     },
                     child: SizedBox(
@@ -259,7 +269,7 @@ class SwapScreen extends StatelessWidget {
                           builder: (context, isCoin1, wg) {
                             
                             return Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
 
                                 if(leUCImpl.coin1 != null)
@@ -274,12 +284,18 @@ class SwapScreen extends StatelessWidget {
                                 ),
 
                                 Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
 
-                                    MyTextConstant(
-                                      text: leUCImpl.coin1 != null ? leUCImpl.coin1?.coinName : 'Select Token',
-                                      // color2: coin1.title == null ? hexaCodeToColor(AppColors.grey) : hexaCodeToColor(AppColors.midNightBlue),
-                                      // fontWeight: coin1.title == null ? FontWeight.normal : FontWeight.bold,
+                                    SizedBox(
+                                      width: MediaQuery.of(context).size.width / 3.8,
+                                      child: MyTextConstant(
+                                        text: leUCImpl.coin1 != null ? leUCImpl.coin1?.coinName : 'Select Token',
+                                        // color2: coin1.title == null ? hexaCodeToColor(AppColors.grey) : hexaCodeToColor(AppColors.midNightBlue),
+                                        // fontWeight: coin1.title == null ? FontWeight.normal : FontWeight.bold,
+                                        textAlign: TextAlign.start,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
 
                                     if (leUCImpl.coin1 != null) Container(
@@ -289,7 +305,7 @@ class SwapScreen extends StatelessWidget {
                                         borderRadius: BorderRadius.circular(10)
                                       ),
                                       child: MyTextConstant(
-                                        text: leUCImpl.coin1!.shortName ?? '',
+                                        text: leUCImpl.coin1!.shortName ?? 'Native',
                                         fontWeight: FontWeight.bold,
                                         fontSize: 12,
                                         textAlign: TextAlign.start,
@@ -353,7 +369,12 @@ class SwapScreen extends StatelessWidget {
                         valueListenable: leUCImpl.isReceiveAmt,
                         builder: (context, receiveingAmt, wg) {
 
-                          if (receiveingAmt == true) return const CircularProgressIndicator();
+                          if (receiveingAmt == true) {
+                            return const SizedBox(
+                            width: 40,
+                            height: 40,
+                            child: Center(child: CircularProgressIndicator()));
+                          }
 
                           return MyTextConstant(
                             textAlign: TextAlign.start,
@@ -418,7 +439,7 @@ class SwapScreen extends StatelessWidget {
                           builder: (context, isCoin2, wg) {
                             
                             return Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
 
                                 if(leUCImpl.coin2 != null)
@@ -433,12 +454,18 @@ class SwapScreen extends StatelessWidget {
                                 ),
 
                                 Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
 
-                                    MyTextConstant(
-                                      text: leUCImpl.coin2 != null ? leUCImpl.coin2?.coinName : 'Select Token',
-                                      // color2: coin1.title == null ? hexaCodeToColor(AppColors.grey) : hexaCodeToColor(AppColors.midNightBlue),
-                                      // fontWeight: coin1.title == null ? FontWeight.normal : FontWeight.bold,
+                                    SizedBox(
+                                      width: MediaQuery.of(context).size.width / 3.8,
+                                      child: MyTextConstant(
+                                        text: leUCImpl.coin2 != null ? leUCImpl.coin2?.coinName : 'Select Token',
+                                        // color2: coin1.title == null ? hexaCodeToColor(AppColors.grey) : hexaCodeToColor(AppColors.midNightBlue),
+                                        // fontWeight: coin1.title == null ? FontWeight.normal : FontWeight.bold,
+                                        textAlign: TextAlign.start,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
 
                                     if (leUCImpl.coin2 != null) Container(
@@ -448,12 +475,12 @@ class SwapScreen extends StatelessWidget {
                                         borderRadius: BorderRadius.circular(10)
                                       ),
                                       child: MyTextConstant(
-                                        text: leUCImpl.coin2!.shortName ?? '',
+                                        text: leUCImpl.coin2!.shortName ?? 'Native',
                                         fontWeight: FontWeight.bold,
                                         fontSize: 12,
                                         textAlign: TextAlign.start,
                                       ),
-                                    )
+                                    ),
                                   ],
                                 )
                               ],
