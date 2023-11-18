@@ -11,6 +11,10 @@ class StatusExolixExchange extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     
+    exchangeUcImpl!.tabBarIndex.value = 0;
+
+    exchangeUcImpl!.getTrxHistory();
+
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -30,12 +34,18 @@ class StatusExolixExchange extends StatelessWidget {
               valueListenable: exchangeUcImpl!.tabBarIndex,
               builder: (context, tabBarIndex, wg) {
 
+                if (exchangeUcImpl!.exchanges![tabBarIndex].tx.isEmpty){
+                  return const Center(
+                    child: MyTextConstant(text: "No Transaction",),
+                  );
+                }
+
                 return ListView(
                   shrinkWrap: true,
                   children: exchangeUcImpl!.exchanges![tabBarIndex].tx.reversed.map((e) {
                     return _statusSwapRes(
                       exchangeUcImpl: exchangeUcImpl!,
-                      lstTx: exchangeUcImpl!.exchanges![tabBarIndex].tx,
+                      lstTx: List<ExChangeTxI>.from(exchangeUcImpl!.exchanges![tabBarIndex].tx),
                       index: exchangeUcImpl!.exchanges![tabBarIndex].tx.indexOf(e) 
                     );
                   }).toList(),
@@ -155,7 +165,7 @@ class StatusExolixExchange extends StatelessWidget {
           textAlign: TextAlign.start,
         ),
         subtitle: MyTextConstant(
-          text: "Status: ${tzToDateTime(lstTx[index].createdAt!)}",
+          text: "Status: ${lstTx[index].createdAt == null ? '' : tzToDateTime(lstTx[index].createdAt!)}",
           color2: hexaCodeToColor(AppColors.iconGreyColor),
           textAlign: TextAlign.start,
         ),
@@ -164,7 +174,7 @@ class StatusExolixExchange extends StatelessWidget {
           builder: (context, statusNotifier, wg) {
 
             return MyTextConstant(
-              text: "Status: ${lstTx[index].status!.value}",
+              text: "Status: ${lstTx[index].status!}",
               color2: hexaCodeToColor(AppColors.primary),
               textAlign: TextAlign.end,
             );

@@ -29,7 +29,7 @@ class ConfirmSwapExchange extends StatelessWidget {
             child: Container()
           ),
 
-          exChangeTxI!.status!.value.toLowerCase() != "success" ? MyButton(
+          exChangeTxI!.status!.toLowerCase() != "success" ? MyButton(
             edgeMargin: const EdgeInsets.all(paddingSize),
             textButton: "Confirm",
             action: () {
@@ -53,10 +53,13 @@ class ConfirmSwapExchange extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 10.0),
             child: Row(
               children: [
-                const SizedBox(
+
+                SizedBox(
                   height: 50,
                   width: 50,
-                  child: CircleAvatar()
+                  child: CircleAvatar(
+                    // child: exChangeTxI!.coinFromIcon!.contains('.svg') ? SvgPicture.network(exChangeTxI.coinFromIcon!) : Image.network(exChangeTxI.coinFromIcon!),
+                  )
                 ),
           
                 const SizedBox(width: 10.0),
@@ -74,7 +77,7 @@ class ConfirmSwapExchange extends StatelessWidget {
                       children: [
 
                         MyTextConstant(
-                          text: "${exChangeTxI!.depositAmt} ${exChangeTxI.coinFromNetwork}",
+                          text: "${exChangeTxI!.depositAmt} ${exChangeTxI.coinFrom}",
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                         ),
@@ -87,7 +90,7 @@ class ConfirmSwapExchange extends StatelessWidget {
                             color: Colors.cyanAccent
                           ),
                           child: MyTextConstant(
-                            text: "${exChangeTxI.coinFromNetworkName}",
+                            text: "${exChangeTxI.coinFromNetwork}",
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                           ),
@@ -114,10 +117,13 @@ class ConfirmSwapExchange extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 10.0),
             child: Row(
               children: [
-                const SizedBox(
+
+                SizedBox(
                   height: 50,
                   width: 50,
-                  child: CircleAvatar()
+                  child: CircleAvatar(
+                    // child: exChangeTxI.coinToIcon!.contains('.svg') ? SvgPicture.network(exChangeTxI.coinToIcon!) : Image.network(exChangeTxI.coinToIcon!),
+                  )
                 ),
           
                 const SizedBox(width: 10.0),
@@ -142,7 +148,7 @@ class ConfirmSwapExchange extends StatelessWidget {
                         ),
 
                         MyTextConstant(
-                          text: "${exChangeTxI.withdrawalAmount} ${exChangeTxI.coinFromNetwork}",
+                          text: "${exChangeTxI.withdrawalAmount} ${exChangeTxI.coinTo}",
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                         ),
@@ -155,7 +161,7 @@ class ConfirmSwapExchange extends StatelessWidget {
                             color: Colors.cyanAccent
                           ),
                           child: MyTextConstant(
-                            text: "${exChangeTxI.coinToNetworkName}",
+                            text: "${exChangeTxI.coinToNetwork}",
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                           ),

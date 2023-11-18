@@ -28,7 +28,7 @@ class ExchangeUcImpl<T> {
   final ExolixExchangeUCImpl exolicUCImpl = ExolixExchangeUCImpl();
   
   final LetsExchangeUCImpl letsExchangeUCImpl = LetsExchangeUCImpl();
-  
+
   final SecureStorageImpl _secureStorageImpl = SecureStorageImpl();
 
   BuildContext? _context;
@@ -49,8 +49,8 @@ class ExchangeUcImpl<T> {
   void initExchangeState() async {
     
     exchanges = [
-      Exchange(title: 'Exolix', getCoins: exolicUCImpl.getCoins, rate: exolicUCImpl.rate, swap: exolicUCImpl.exolixSwap),
-      Exchange(title: 'LetsExchange', getCoins: letsExchangeUCImpl.getCoins, rate: letsExchangeUCImpl.rate, swap: letsExchangeUCImpl.letsExchangeSwap) 
+      Exchange(title: 'Exolix', instance: exolicUCImpl, storageKey: DbKey.lstExolicTxIds_key, getCoins: exolicUCImpl.getCoins, rate: exolicUCImpl.rate, swap: exolicUCImpl.exolixSwap),
+      Exchange(title: 'LetsExchange', instance: letsExchangeUCImpl, storageKey: DbKey.lstLetsExchangeTxIds, getCoins: letsExchangeUCImpl.getCoins, rate: letsExchangeUCImpl.rate, swap: letsExchangeUCImpl.letsExchangeSwap) 
     ];
 
     isExchangeStateReady.value = true;
@@ -70,7 +70,10 @@ class ExchangeUcImpl<T> {
   }
 
   void onChangedTabBar(int index){
+
     tabBarIndex.value = index;
+
+    getTrxHistory();
   }
 
   Future<void> getExchangeCoins() async {
@@ -83,38 +86,34 @@ class ExchangeUcImpl<T> {
 
   }
 
-  // Future<void> getTrxHistory() async {
+  Future<void> getTrxHistory() async {
+
+    print("getTrxHistory");
 
   //   print("getTrxHistory");
 
-  //   if (exchanges![currentIndex.value].tx.isEmpty){
+    if (exchanges![tabBarIndex.value].tx.isEmpty){
 
-  //     await _secureStorageImpl.readSecure(DbKey.lstExolicTxIds_key)!.then( (localLstTx){
+    print(" ${exchanges![currentIndex.value].storageKey}");
 
-  //       exolicUCImpl.lstTx = json.decode(localLstTx);
+      await _secureStorageImpl.readSecure(exchanges![tabBarIndex.value].storageKey!)!.then( (localLstTx){
 
-  //       exchanges![currentIndex.value].tx = exolicUCImpl.lstTx!.map((e) {
-  //         return exchanges![currentIndex.value].tx
-  //       });
+        print("localLstTx $localLstTx");
 
-  //   //     lstTx?.clear();
+        if (localLstTx.isNotEmpty){
+          exchanges![tabBarIndex.value].tx = List<T>.from(json.decode(localLstTx)).map((e) {
+            return exchanges![tabBarIndex.value].instance.fromJson(e);
+          }).toList();
+        }
 
-  //   //     // ignore: unnecessary_null_comparison
-  //   //     if (localLstTx.isNotEmpty){
+      });
 
-  //   //       // lstTx = List<Map<String, dynamic>>.from((json.decode(localLstTx))).map((e) {
-  //   //       //   return ExolixSwapResModel.fromJson(e);
-  //   //       // }).toList();
-  //   //     }
-        
-  //   //     // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-  //   //     isReady.value = true;
-
-  //     });
+      exchanges![tabBarIndex.value].tx.forEach((element) {print(element.createdAt);});
       
-  //   }
-    
-  // }
+      // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
+      tabBarIndex.notifyListeners();
+    }
+  }
 
   void queryEstimateAmt() {
 
@@ -124,9 +123,13 @@ class ExchangeUcImpl<T> {
 
       if (coin1 != null && coin2 != null){
 
-        receivedAmt = (await exchanges![currentIndex.value].rate(coin1!, coin2!, swapModel)).toString();
+        try {
+          receivedAmt = (await exchanges![currentIndex.value].rate(coin1!, coin2!, swapModel)).toString();
 
-        isReceiveAmt.value = false;
+          isReceiveAmt.value = false;
+        } catch (e){
+          isReceiveAmt.value = false;
+        }
         
       }
     });
@@ -242,7 +245,7 @@ class ExchangeUcImpl<T> {
 
       dialogLoading(_context!);
 
-      swapModel.withdrawal = Provider.of<SDKProvider>(_context!, listen: false).getSdkImpl.evmAddress;
+      swapModel.withdrawalAddr = Provider.of<SDKProvider>(_context!, listen: false).getSdkImpl.evmAddress;
       await exchanges![currentIndex.value].swap(swapModel).then( (ExChangeTxI res){
         print(res.id);
         exchanges![currentIndex.value].tx.add( res );
@@ -296,7 +299,62 @@ class ExchangeUcImpl<T> {
     );
   }
 
-  void swapping(){}
+  Future<void> paySwap(int index) async {
+    
+    Navigator.push(
+      _context!,
+      MaterialPageRoute(builder: (context) => const PincodeScreen(title: '', label: PinCodeLabel.fromSendTx,))
+    ).then((value) async {
+
+      // _paymentUcImpl.recipientController.text = lstTx![index].depositAddress!;
+      // _paymentUcImpl.amountController.text = lstTx![index].amount!;
+
+      if (value != null){
+        // await _paymentUcImpl.sendBep20();
+      }
+    });
+
+  }
+
+  Future<void> swapping() async {
+    
+    int index = Provider.of<WalletProvider>(_context!, listen: false).sortListContract!.indexWhere((model) {
+      
+      if ( swapModel.from!.toLowerCase() == model.symbol!.toLowerCase() ){
+        return true;
+      }
+
+      return false;
+
+    });
+
+    if (index != -1){
+
+      await Navigator.pushReplacement(
+        _context!,
+        MaterialPageRoute(builder: (context) => TokenPayment(index: index, address: swapModel.withdrawalAddr, amt: swapModel.amt!.value,))
+      );
+      
+    } else {
+      
+      await QuickAlert.show(
+        context: _context!,
+        type: QuickAlertType.warning,
+        showCancelBtn: true,
+        cancelBtnText: "Close",
+        cancelBtnTextStyle: TextStyle(fontSize: 14, color: hexaCodeToColor(AppColors.primaryBtn)),
+        text: '${swapModel.networkFrom} (${swapModel.networkTo}) is not found. Please add contract token !',
+        confirmBtnText: 'Add Contract',
+        onConfirmBtnTap: (){
+          // Navigator.pushReplacement(
+          //   _context!, 
+          //   MaterialPageRoute(builder: (context) => AddAsset(index: swapResModel.coinFrom!.network == "BSC" ? 0 : 1,))
+          // );
+        }
+      );
+
+    }
+  }
 
   Future<void> getStatus() async {
 

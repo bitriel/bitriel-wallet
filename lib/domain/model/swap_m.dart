@@ -6,7 +6,7 @@ class SwapModel {
   String? from;
   String? to;
   String? networkFrom;
-  String? withdrawal;
+  String? withdrawalAddr;
   String? networkTo;
   ValueNotifier<String>? amt;
   String? affiliateId;
@@ -27,8 +27,8 @@ class SwapModel {
       "coin_from": from,
       "coin_to": to,
       "deposit_amount": amt!.value,
-      "withdrawal": withdrawal,
-      "return": withdrawal,
+      "withdrawal": withdrawalAddr,
+      "return": withdrawalAddr,
       "network_from": networkFrom,
       "network_to": networkTo,
       "withdrawal_extra_id": null,

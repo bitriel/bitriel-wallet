@@ -31,9 +31,7 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI, 
   ExolixExchangeUCImpl.mapping({this.code, this.coinName, this.network, this.networkName, this.icon, this.shortName});
 
   @override
-  String? id, coinFrom ,coinFromNetwork ,coinFromIcon, coinFromNetworkName ,coinTo, coinToNetworkName ,coinToNetwork ,coinToIcon ,depositAddr ,depositAmt ,withdrawalAddress ,createdAt ,withdrawalAmount;
-  @override
-  ValueNotifier<String>? status;
+  String? id, coinFrom ,coinFromNetwork ,coinFromIcon, coinFromNetworkName ,coinTo, coinToNetworkName ,coinToNetwork ,coinToIcon ,depositAddr ,depositAmt ,withdrawalAddress ,createdAt ,withdrawalAmount, status;
   ExolixExchangeUCImpl.txMapping({
     required this.id,
     required this.coinFrom,
@@ -74,7 +72,7 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI, 
       withdrawalAmount: jsn['amount'].toString(),
 
       createdAt: jsn['createdAt'],
-      status: ValueNotifier(jsn['status']),
+      status: jsn['status'],
 
     );
   }
@@ -128,6 +126,17 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI, 
 
   }
 
+  Future<void> initListTx() async {
+
+    await SecureStorageImpl().readSecure(DbKey.lstExolicTxIds_key)!.then((value) {
+
+      if (value.isNotEmpty){
+        lstTx = List<Map<String, dynamic>>.from(json.decode(value));
+      }
+    });
+
+  }
+
   @override
   Future<ExChangeTxI> exolixSwap(SwapModel swapModel) async {
 
@@ -155,6 +164,8 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI, 
       }
 
       else if (value.statusCode == 201) {
+
+        await initListTx();
 
         lstTx!.add(json.decode(value.body));
         

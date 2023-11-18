@@ -1,6 +1,39 @@
 import 'package:bitriel_wallet/domain/usecases/swap_uc/exchange.i.dart';
 import 'package:bitriel_wallet/index.dart';
 
+Map mapp = {
+  "transaction_id": "5bb4d99cd44a5",
+  "status": "wait",
+  "coin_from": "ETH",
+  "coin_from_network": "ERC20",
+  "coin_to": "USDT",
+  "coin_to_network": "TRC20",
+  "deposit_amount": 0.25281436,
+  "withdrawal_amount": 0.25281436,
+  "deposit": "LsZK2wfxvXrdffsfB6L39qmCcV5DK29ismmAwN41",
+  "deposit_extra_id": null,
+  "withdrawal": "0x5aadfa328D778383d1134F7530f9feaC676E74B80efCa",
+  "withdrawal_extra_id": null,
+  "rate": 0.26011493,
+  "fee": 0,
+  "return": "LsZK2wfxvXrfsfB6L39qmCcV5DK29ismmAwN41",
+  "return_hash": "qbGDbH9gwrAkfJTM6gxsfQpWYMfe8zRuZsSpoU77sx73peCPbzdZaUWW9tKWbBDs3hmeV",
+  "return_amount": "Vemh3sDBbWKt9WWUaZdzbPCep37xs77UopSsZuRz8efMYWpQfsxg6MTJfkArwg9HbDGbq",
+  "return_extra_id": 0.1,
+  "final_amount": 0.00330021,
+  "hash_in": "",
+  "hash_out": "",
+  "is_float": true,
+  "coin_from_explorer_url": "https:\\/\\/explorer.binance.org\\/tx\\/",
+  "coin_to_explorer_url": "https:\\/\\/explorer.binance.org\\/tx\\/",
+  "aml_error_signals": [
+    {
+      "key": "ATM",
+      "percent": "14"
+    }
+  ]
+};
+
 class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExChangeTxI {
 
   BuildContext? _context;
@@ -11,7 +44,7 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
 
   final PaymentUcImpl _paymentUcImpl = PaymentUcImpl();
 
-  List<Map<String, dynamic>>? lstTx = [];
+  List<Map<String, dynamic>> lstTx = [];
   
   ValueNotifier<bool> statusNotifier = ValueNotifier(false);
 
@@ -30,9 +63,7 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
   LetsExchangeUCImpl.mapping({this.code, this.coinName, this.network, this.networkName, this.icon, this.shortName});
 
   @override
-  String? id, coinFrom ,coinFromNetwork ,coinFromIcon, coinFromNetworkName ,coinTo, coinToNetworkName ,coinToNetwork ,coinToIcon ,depositAddr ,depositAmt ,withdrawalAddress ,createdAt ,withdrawalAmount;
-  @override
-  ValueNotifier<String>? status;
+  String? id, coinFrom ,coinFromNetwork ,coinFromIcon, coinFromNetworkName ,coinTo, coinToNetworkName ,coinToNetwork ,coinToIcon ,depositAddr ,depositAmt ,withdrawalAddress ,createdAt ,withdrawalAmount, status;
   LetsExchangeUCImpl.txMapping({
     required this.id,
     required this.coinFrom,
@@ -54,6 +85,7 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
   });
 
   ExChangeTxI fromJson(Map<String, dynamic> jsn){
+    
     return LetsExchangeUCImpl.txMapping(
       id: jsn['transaction_id'],
 
@@ -68,9 +100,9 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
       coinToIcon: jsn['coin_to_icon'],
 
       depositAddr: jsn['deposit'],
-      depositAmt: jsn['deposit_amt'],
+      depositAmt: jsn['deposit_amount'].toString(),
 
-      status: ValueNotifier(jsn['status']),
+      status: jsn['status'],
       withdrawalAmount: jsn['withdrawal_amount'].toString(),
 
       withdrawalAddress: jsn['withdrawal'],
@@ -79,12 +111,21 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
     );
   }
 
+  Future<void> initListTx() async {
+
+    await SecureStorageImpl().readSecure(DbKey.lstLetsExchangeTxIds)!.then((value) {
+
+      if (value.isNotEmpty){
+        lstTx = List<Map<String, dynamic>>.from(json.decode(value));
+      }
+    });
+
+  }
+
   @override
   Future<List<ExchangeCoinI>> getCoins() async {
     
     defaultLstCoins = await _letsExchangeRepoImpl.getLetsExchangeCoin();
-    
-    print("defaultLstCoins $defaultLstCoins");
 
     for (var element in defaultLstCoins) {
 
@@ -131,8 +172,16 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
   @override
   Future<ExChangeTxI> letsExchangeSwap(SwapModel swapModel) async {
 
-    return await _letsExchangeRepoImpl.swap(swapModel.toJson()).then((value) async {
-        
+    print("letsExchangeSwap");
+
+    // await _letsExchangeRepoImpl.swap(swapModel.toJson()).then((value) async {
+    return await Future.delayed(const Duration(seconds: 1), () async {
+
+    // });
+    
+    // return Response(json.encode(map), 200).then((value) async {
+      Response value = Response(json.encode(mapp), 200);
+
       if (value.statusCode == 401){
         throw json.decode(value.body)['error'];
       }
@@ -146,26 +195,15 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
 
       else if (value.statusCode == 200) {
 
-        // tx = ExolixExchangeUCImpl.txMapping(
-        //   id: jsn['transaction_id'],
-        //   coinFrom: jsn['coin_from'],
-        //   coinFromNetwork: jsn['coin_from_network'],
-        //   coinFromIcon: jsn['coin_from_icon'],
-        //   coinTo: jsn['coin_to'],
-        //   coinToNetwork: jsn['coin_to_network'],
-        //   coinToIcon: jsn['coin_to_icon'],
-        //   deposit: jsn['deposit'],
-        //   depositAmt: jsn['deposit_amt'],
-        //   withdrawal: jsn['withdrawal'],
-        //   createdAt: jsn['created_at'],
-        //   status: ValueNotifier(jsn['status']),
-        //   withdrawalAmount: jsn['withdrawal_amount'].toString(),
-        // );
+        await initListTx();
 
-        // lstTx!.add(SwapResModel.fromJson(jsn));
-        lstTx!.add(json.decode(value.body));
+        Map<String, dynamic> jsn = json.decode(value.body);
+
+        jsn.addAll({"created_at": DateTime.now().toUtc().toString().replaceAll(" ", "T")});
+
+        lstTx.add(jsn);
         
-        await SecureStorageImpl().writeSecure(DbKey.lstTxIds, json.encode(lstTx!));
+        await SecureStorageImpl().writeSecure(DbKey.lstLetsExchangeTxIds, json.encode(lstTx));
 
         await QuickAlert.show(
           context: _context!,
@@ -176,7 +214,7 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
           confirmBtnText: "Confirm",
           text: 'Swap Successfully!',
           onConfirmBtnTap: () {
-            confirmSwap(lstTx!.length - 1);
+            confirmSwap(lstTx.length - 1);
           },
         );
 

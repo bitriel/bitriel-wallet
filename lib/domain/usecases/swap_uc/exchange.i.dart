@@ -32,7 +32,7 @@ abstract class ExChangeTxI {
   String? depositAmt;
   String? withdrawalAddress;
   String? createdAt;
-  ValueNotifier<String>? status;
+  String? status;
   String? withdrawalAmount;
   
 }
