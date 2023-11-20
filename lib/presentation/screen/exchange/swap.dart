@@ -1,4 +1,3 @@
-import 'package:bitriel_wallet/domain/model/exchange.model/exchange.m.dart';
 import 'package:bitriel_wallet/domain/usecases/swap_uc/exchange.uc.impl.dart';
 import 'package:bitriel_wallet/index.dart';
 import 'package:bitriel_wallet/presentation/screen/exchange/status_tx.dart';
@@ -16,8 +15,6 @@ class SwapScreen extends StatelessWidget {
     _exchangeUcImpl.setContext = context;
 
     _exchangeUcImpl.initExchangeState();
-
-    // _exchangeUcImpl.getTrxHistory();
 
     return Scaffold(
       appBar: AppBar(
@@ -81,31 +78,26 @@ class SwapScreen extends StatelessWidget {
                   color: Colors.white,
                   borderRadius: BorderRadius.all(Radius.circular(10))
                 ),
-                child: ValueListenableBuilder(
-                  valueListenable: _exchangeUcImpl.swapModel.amt!,
-                  builder: (context, value, wg) {
-                    return Column(
-                      children: [
+                child: Column(
+                  children: [
 
-                        _payInput(context, _exchangeUcImpl),
+                    _payInput(context, _exchangeUcImpl),
 
-                        const SizedBox(height: 10),
+                    const SizedBox(height: 10),
 
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: IconButton(
-                            onPressed: (){
-                              
-                            },
-                            icon: Icon(Iconsax.refresh_circle, size: 35, color: hexaCodeToColor(AppColors.orangeColor),)
-                          ),
-                        ),
-                      
-                        _getDisplay(context, _exchangeUcImpl),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: IconButton(
+                        onPressed: (){
+                          
+                        },
+                        icon: Icon(Iconsax.refresh_circle, size: 35, color: hexaCodeToColor(AppColors.orangeColor),)
+                      ),
+                    ),
+                  
+                    _getDisplay(context, _exchangeUcImpl),
 
-                      ],
-                    );
-                  }
+                  ],
                 ),
               ),
             ),
@@ -118,33 +110,12 @@ class SwapScreen extends StatelessWidget {
               textColor: Colors.white,
             ),
 
-            // const MyTextConstant(text: "Exchange",),
-            
-            // ValueListenableBuilder(
-            //   valueListenable: _exchangeUcImpl.isExchangeStateReady,
-            //   builder: (context, isExchangeStateReady, wg) {
-
-            //     if (isExchangeStateReady == false) return const Center(child: CircularProgressIndicator(),);
-            //     return DropdownButton<int>(
-            //       value: _exchangeUcImpl.currentIndex.value,
-            //       items: _exchangeUcImpl.exchanges?.map((e) {
-            //         return DropdownMenuItem<int>(
-            //           onTap: () => _exchangeUcImpl.switchExchange(_exchangeUcImpl.exchanges!.indexOf(e)),
-            //           value: _exchangeUcImpl.exchanges!.indexOf(e),
-            //           child: MyTextConstant(text: e.title),
-            //         );
-            //       }).toList(), 
-            //       onChanged: _exchangeUcImpl.onDropDownChange
-            //     );
-            //   }
-            // ),
-
             Expanded(
               child: Container()
             ),
 
             Center(
-              child: _buildNumberPad(context, _exchangeUcImpl.swapModel.amt!.value, _exchangeUcImpl.onDeleteTxt, _exchangeUcImpl.formatDouble)
+              child: _buildNumberPad(context, _exchangeUcImpl.swapModel.withdrawAmt!.value, _exchangeUcImpl.onDeleteTxt, _exchangeUcImpl.formatDouble)
             ),
 
             // Swap Button
@@ -211,14 +182,14 @@ class SwapScreen extends StatelessWidget {
                         color: hexaCodeToColor(AppColors.background)
                       ),
                       child: ValueListenableBuilder(
-                        valueListenable: leUCImpl.swapModel.amt!,
+                        valueListenable: leUCImpl.swapModel.withdrawAmt!,
                         builder: (context, amt, widget) {
 
                           return MyTextConstant(
                             textAlign: TextAlign.start,
-                            text: leUCImpl.swapModel.amt!.value.isEmpty ? "0.00" : amt.toString(),
+                            text: amt.isEmpty ? "0.00" : amt.toString(),
                             fontSize: 20,
-                            color2: leUCImpl.swapModel.amt!.value.isEmpty ? hexaCodeToColor(AppColors.grey) : hexaCodeToColor(AppColors.midNightBlue),
+                            color2: amt.isEmpty ? hexaCodeToColor(AppColors.grey) : hexaCodeToColor(AppColors.midNightBlue),
                           );
                         }
                       ),
@@ -379,7 +350,7 @@ class SwapScreen extends StatelessWidget {
                           return MyTextConstant(
                             textAlign: TextAlign.start,
                             // text: pro.lstConvertCoin![pro.name2] != null ? "≈ ${pro.lstConvertCoin![pro.name2]}" : "≈ 0",
-                            text: "≈ ${leUCImpl.receivedAmt}",
+                            text: "≈ ${leUCImpl.swapModel.depositAmt}",
                             fontSize: 20,
                           );
                         }

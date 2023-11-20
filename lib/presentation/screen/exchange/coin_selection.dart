@@ -1,71 +1,91 @@
 import 'package:bitriel_wallet/domain/usecases/swap_uc/exchange.i.dart';
+import 'package:bitriel_wallet/domain/usecases/swap_uc/exchange.uc.impl.dart';
 import 'package:bitriel_wallet/index.dart';
 
 class SelectSwapToken extends StatelessWidget {
-
+  
+  final ExchangeUcImpl? exchangeUcImpl;
   final List<ExchangeCoinI> coin;
   final ExchangeCoinI? coin1;
   final ExchangeCoinI? coin2;
 
-  const SelectSwapToken({
+  SelectSwapToken({
     super.key, required this.coin,
     required this.coin1,
     required this.coin2,
+    required this.exchangeUcImpl
   });
+
+  final TextEditingController searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
 
-    final TextEditingController searchController = TextEditingController();
+    exchangeUcImpl!.searched = null;
 
     return Scaffold(
       appBar: appBar(context, title: "Select Token"),
       body: Column(
         children: [
       
-          _searchBar(searchController, coin),
+          _searchBar(searchController, coin, exchangeUcImpl!.onSearched,),
 
           Expanded(
             child: Stack(
               children: [
+
                 ListView.builder(
                   itemCount: coin.length,
+                  shrinkWrap: true,
                   itemBuilder: (context, index) {
 
-                    return _listTokenItem(
-                      context, 
-                      index,
-                      coin1,
-                      coin2
-                    );
+                    return _listTokenItem(context, index, coin1, coin2);
                     
                   },
                 ),
+            
+                ValueListenableBuilder(
+                  valueListenable: exchangeUcImpl!.isSearching,
+                  builder: (context, isSearching, wg) {
 
+                    if (isSearching == true) return const Center(child: CircularProgressIndicator(),);
+
+                    if (exchangeUcImpl!.searched == null) {
+                      return const SizedBox();
+                    }
+
+                    else if (exchangeUcImpl!.searched!.isEmpty){
+                      return const Center(
+                        child: MyTextConstant(text: "Coin Not found"),
+                      );
+                    }
+
+                    return Container(
+                      width: MediaQuery.of(context).size.width,
+                      color: Colors.white,
+                      child: Expanded(
+                        child: ListView.builder(
+                          itemCount: exchangeUcImpl!.searched!.length,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                    
+                            return _listTokenItem(context, index, coin1, coin2);
+                          },
+                        ),
+                      ),
+                    );
+                  }
+                ),
 
               ],
             ),
           ),
-      
-          // ValueListenableBuilder(
-          //   valueListenable: leRepoImpl.lstLECoin,
-          //   builder: (context, value, wg) {
-          //     return Expanded(
-          //       child: ListView.builder(
-          //         itemCount: value.length,
-          //         itemBuilder: (context, index) {
-          //           return _listTokenItem(index);
-          //         },
-          //       ),
-          //     );
-          //   }
-          // ),
         ],
       ),
     );
   }
 
-  Widget _searchBar(TextEditingController searchController, List<ExchangeCoinI> coin) {
+  Widget _searchBar(TextEditingController searchController, List<ExchangeCoinI> coin, Function(String)? onSearched) {
     return Padding(
       padding: const EdgeInsets.only(top: 15 / 2, left: 15, right: 15, bottom: 15 / 2),
       child: TextField(
@@ -89,6 +109,7 @@ class SelectSwapToken extends StatelessWidget {
             borderRadius: BorderRadius.circular(50.0),
           ),
         ),
+        onChanged: onSearched,
       ),
     );
   }

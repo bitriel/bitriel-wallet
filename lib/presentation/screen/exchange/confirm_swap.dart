@@ -2,6 +2,10 @@ import 'package:bitriel_wallet/domain/usecases/swap_uc/exchange.i.dart';
 import 'package:bitriel_wallet/index.dart';
 
 class ConfirmSwapExchange extends StatelessWidget {
+  
+  final String exchangeName;
+
+  final int? index;
 
   final ValueNotifier<bool>? statusNotifier;
 
@@ -11,7 +15,7 @@ class ConfirmSwapExchange extends StatelessWidget {
 
   final Function? getStatus;
   
-  const ConfirmSwapExchange({required this.statusNotifier, super.key, required this.exChangeTxI, required this.confirmSwap, this.getStatus});
+  const ConfirmSwapExchange({required this.exchangeName, required this.index, required this.statusNotifier, super.key, required this.exChangeTxI, required this.confirmSwap, this.getStatus});
 
   @override
   Widget build(BuildContext context) {
@@ -29,20 +33,29 @@ class ConfirmSwapExchange extends StatelessWidget {
             child: Container()
           ),
 
-          exChangeTxI!.status!.toLowerCase() != "success" ? MyButton(
-            edgeMargin: const EdgeInsets.all(paddingSize),
-            textButton: "Confirm",
-            action: () {
-              confirmSwap!(exChangeTxI);
-            },
-          ) : const SizedBox(),
+          ValueListenableBuilder(
+            valueListenable: statusNotifier!, 
+            builder: (context, status, wg){
+
+              if (exChangeTxI!.status!.toLowerCase() != "wait") return const SizedBox();
+
+              return  MyButton(
+                edgeMargin: const EdgeInsets.all(paddingSize),
+                textButton: "Confirm",
+                action: (){
+                  confirmSwap!(exChangeTxI);
+                },
+              );
+              
+            }
+          )
       
         ],
       ),
     );
   }
 
-  Widget _swapTokenInfo(ExChangeTxI? exChangeTxI) {
+  Widget  _swapTokenInfo(ExChangeTxI? exChangeTxI) {
     return Padding(
       padding: const EdgeInsets.all(15),
       child: Column(
@@ -58,7 +71,7 @@ class ConfirmSwapExchange extends StatelessWidget {
                   height: 50,
                   width: 50,
                   child: CircleAvatar(
-                    // child: exChangeTxI!.coinFromIcon!.contains('.svg') ? SvgPicture.network(exChangeTxI.coinFromIcon!) : Image.network(exChangeTxI.coinFromIcon!),
+                    child: exChangeTxI!.coinFromIcon!.contains('.svg') ? SvgPicture.network(exChangeTxI.coinFromIcon!) : Image.network(exChangeTxI.coinFromIcon!),
                   )
                 ),
           
@@ -77,7 +90,7 @@ class ConfirmSwapExchange extends StatelessWidget {
                       children: [
 
                         MyTextConstant(
-                          text: "${exChangeTxI!.depositAmt} ${exChangeTxI.coinFrom}",
+                          text: "${exChangeTxI.withdrawalAmount} ${exChangeTxI.coinFrom}",
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                         ),
@@ -122,7 +135,7 @@ class ConfirmSwapExchange extends StatelessWidget {
                   height: 50,
                   width: 50,
                   child: CircleAvatar(
-                    // child: exChangeTxI.coinToIcon!.contains('.svg') ? SvgPicture.network(exChangeTxI.coinToIcon!) : Image.network(exChangeTxI.coinToIcon!),
+                    child: exChangeTxI.coinToIcon!.contains('.svg') ? SvgPicture.network(exChangeTxI.coinToIcon!) : Image.network(exChangeTxI.coinToIcon!),
                   )
                 ),
           
@@ -136,19 +149,18 @@ class ConfirmSwapExchange extends StatelessWidget {
                       color2: hexaCodeToColor(AppColors.grey),
                       fontWeight: FontWeight.w600,
                     ),
-          
                     
                     Row(
                       children: [
 
                         MyTextConstant(
-                          text: exChangeTxI.withdrawalAmount,
+                          text: exChangeTxI.depositAmt,
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                         ),
 
                         MyTextConstant(
-                          text: "${exChangeTxI.withdrawalAmount} ${exChangeTxI.coinTo}",
+                          text: " ${exChangeTxI.coinTo}",
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                         ),
@@ -275,8 +287,8 @@ class ConfirmSwapExchange extends StatelessWidget {
                             
                       const Spacer(),
                             
-                      const MyTextConstant(
-                        text: "Exolix.com",
+                      MyTextConstant(
+                        text: exchangeName,
                         fontWeight: FontWeight.w600,
                       ),
                     
@@ -362,11 +374,11 @@ class ConfirmSwapExchange extends StatelessWidget {
                               valueListenable: statusNotifier!,
                               builder: (context, statusNotifier, wg) {
                                 
-                                print("statusNotifier $statusNotifier");
                                 return MyTextConstant(
-                                  text: "Status: ${exChangeTxI!.status}",
+                                  text: "${exChangeTxI.status}",
                                   color2: hexaCodeToColor(AppColors.primary),
                                   textAlign: TextAlign.end,
+                                  fontWeight: FontWeight.bold,
                                 );
                               }
                             )
@@ -381,10 +393,11 @@ class ConfirmSwapExchange extends StatelessWidget {
                         icon: Icon(Iconsax.refresh_circle, color: hexaCodeToColor(AppColors.orangeColor)),
                         onPressed: () async {
 
-                          exChangeTxI = await getStatus();
+                          exChangeTxI.status = await getStatus(index!);
 
                           // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
                           statusNotifier!.notifyListeners();
+                          
                         },  
                       )
                       

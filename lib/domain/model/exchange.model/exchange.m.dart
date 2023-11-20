@@ -9,6 +9,8 @@ class Exchange<T> {
   Function getCoins;
   Function rate;
   Function swap;
+  Function getStatus;
+  Function confirmSwap;
   T? instance;
 
   Exchange({
@@ -18,7 +20,9 @@ class Exchange<T> {
     this.coins = const [], 
     required this.rate,
     required this.swap,
-    required this.instance
+    required this.instance,
+    required this.getStatus,
+    required this.confirmSwap
   });
 
 }

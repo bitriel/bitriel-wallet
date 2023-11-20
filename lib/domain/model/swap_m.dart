@@ -5,18 +5,23 @@ class SwapModel {
   
   String? from;
   String? to;
+  String? iconFrom;
+  String? iconTo;
   String? networkFrom;
   String? withdrawalAddr;
   String? networkTo;
-  ValueNotifier<String>? amt;
   String? affiliateId;
+
+  ValueNotifier? withdrawAmt;
+  String? depositAmt;
 
   SwapModel(){
     from = "";
     to = "";
     networkFrom = "";
     networkTo = "";
-    amt = ValueNotifier("");
+    withdrawAmt = ValueNotifier("");
+    depositAmt = "";
     affiliateId = "DCNVjpI0Txr1Sw2w";
   }
 
@@ -26,11 +31,11 @@ class SwapModel {
     return {
       "coin_from": from,
       "coin_to": to,
-      "deposit_amount": amt!.value,
+      "icon_from": iconFrom,
+      "icon_to": iconTo,
+      "deposit_amount": withdrawAmt!.value,
       "withdrawal": withdrawalAddr,
       "return": withdrawalAddr,
-      "network_from": networkFrom,
-      "network_to": networkTo,
       "withdrawal_extra_id": null,
       "affiliate_id": affiliateId,
     };

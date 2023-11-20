@@ -2,6 +2,7 @@ import 'package:bitriel_wallet/data/repository/exolix_ex_repo/exolix_ex_repo_imp
 import 'package:bitriel_wallet/domain/usecases/swap_uc/exchange.i.dart';
 import 'package:bitriel_wallet/domain/usecases/swap_uc/exolix_uc/exolix_ex_uc.dart';
 import 'package:bitriel_wallet/index.dart';
+import 'package:bitriel_wallet/presentation/screen/exchange/confirm_swap.dart';
 
 Map map = {"id":"ex5ec4c12c76d7","amount":1,"amountTo":752.47824881,"coinFrom":{"coinCode":"ETH","coinName":"Ethereum","network":"ETH","networkName":"Ethereum","networkShortName":"ERC20","icon":"https://exolix.com/icons/coins/ETH.png","memoName":""},"coinTo":{"coinCode":"CAKE","coinName":"PancakeSwap","network":"BSC","networkName":"BNB Smart Chain (BEP20)","networkShortName":"BEP20","icon":"https://exolix.com/icons/coins/CAKE.png","memoName":""},"comment":null,"createdAt":"2023-11-16T07:41:32.682Z","depositAddress":"0xC1AA43D509ea7f840DDeC6721f6601E552a3803b","depositExtraId":null,"withdrawalAddress":"0xe11175d356d20b70abcec858c6b82b226e988941","withdrawalExtraId":null,"refundAddress":"0xe11175d356d20b70abcec858c6b82b226e988941","refundExtraId":null,"hashIn":{"hash":null,"link":null},"hashOut":{"hash":null,"link":null},"rate":752.47824881,"rateType":"fixed","affiliateToken":null,"status":"wait","source":"api","email":null};
 
@@ -11,8 +12,6 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI, 
 
   List<Map<String, dynamic>> defaultLstCoins = [];
 
-  ExolixSwapModel swapModel = ExolixSwapModel();
-
   final PaymentUcImpl _paymentUcImpl = PaymentUcImpl();
 
   // List<ExolixSwapResModel>? lstTx = [];
@@ -20,10 +19,12 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI, 
 
   BuildContext? _context;
 
-  int? index;
+  // int? index;
   
   List<ExchangeCoinI> filteredCoins = [];
   ExChangeTxI? tx;
+
+  Map<String, dynamic>? jsn;
 
   @override
   String? code, coinName, network, networkName, shortName, icon;
@@ -56,13 +57,13 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI, 
       id: jsn['id'],
 
       coinFrom: jsn['coinFrom']['coinCode'],
-      coinFromNetwork: jsn['coinFromNetwork'],
+      coinFromNetwork: jsn['coinFrom']['networkShortName'],
       coinFromNetworkName: jsn['coinFrom']['networkName'],
       coinFromIcon: jsn['coinFrom']['icon'],
 
       coinTo: jsn['coinTo']['coinCode'],
       coinToNetwork: jsn['coinTo']['networkShortName'],
-      coinToNetworkName: jsn['coinTo']['networkShortName'],
+      coinToNetworkName: jsn['coinTo']['networkName'],
       coinToIcon: jsn['coinTo']['icon'],
 
       depositAddr: jsn['depositAddress'],
@@ -121,7 +122,7 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI, 
   Future<String> rate(ExchangeCoinI coin1, ExchangeCoinI coin2, SwapModel swapModel) async {
 
     return await _exolixExchangeRepoImpl.exolixTwoCoinInfo(
-      "coinFrom=${coin1.code}&networkFrom=${coin1.network}&coinTo=${coin2.code}&networkTo=${coin2.network}&amount=${swapModel.amt!.value}&rateType=fixed"
+      "coinFrom=${coin1.code}&networkFrom=${coin1.network}&coinTo=${coin2.code}&networkTo=${coin2.network}&amount=${swapModel.withdrawAmt!.value}&rateType=fixed"
     ).then((value) => json.decode(value.body)['toAmount'].toString());
 
   }
@@ -145,15 +146,15 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI, 
       "coinTo": swapModel.to,
       "networkFrom": swapModel.networkFrom,
       "networkTo": swapModel.networkTo,
-      "amount": swapModel.amt!.value,
+      "amount": swapModel.withdrawAmt!.value,
       "withdrawalAddress": Provider.of<SDKProvider>(_context!, listen: false).getSdkImpl.evmAddress,
       "refundAddress": Provider.of<SDKProvider>(_context!, listen: false).getSdkImpl.evmAddress
     };
 
-    Response value = Response(json.encode(map), 201);
+    // Response value = Response(json.encode(map), 201);
 
-    // return await _exolixExchangeRepoImpl.exolixSwap(body).then((value) async {
-    return await Future.delayed(const Duration(seconds: 1), () async {
+    return await _exolixExchangeRepoImpl.exolixSwap(body).then((value) async {
+    // return await Future.delayed(const Duration(seconds: 1), () async {
       
       if (value.statusCode == 401){
         throw json.decode(value.body)['error'];
@@ -167,7 +168,9 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI, 
 
         await initListTx();
 
-        lstTx!.add(json.decode(value.body));
+        jsn = json.decode(value.body);
+
+        lstTx!.add(jsn!);
         
         await SecureStorageImpl().writeSecure(DbKey.lstExolicTxIds_key, json.encode(lstTx));
 
@@ -180,7 +183,7 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI, 
           confirmBtnText: "Confirm",
           text: 'Swap Successfully!',
           onConfirmBtnTap: () async {
-            await exolixConfirmSwap(lstTx!.length - 1);
+            // await exolixConfirmSwap(lstTx!.length - 1);
           },
         );
 
@@ -191,34 +194,6 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI, 
       }
     });
     
-  }
-
-  // Index Of List
-  Future<void> paySwap(int index) async {
-    
-    // Navigator.push(
-    //   _context!,
-    //   MaterialPageRoute(builder: (context) => const PincodeScreen(title: '', label: PinCodeLabel.fromSendTx,))
-    // ).then((value) async {
-
-    //   _paymentUcImpl.recipientController.text = lstTx![index].depositAddress!;
-    //   _paymentUcImpl.amountController.text = lstTx![index].amount!;
-
-    //   if (value != null){
-    //     await _paymentUcImpl.sendBep20();
-    //   }
-    // });
-
-  }
-
-  @override
-  Future<void> exolixConfirmSwap(int indx) async {
-    
-    // index = indx;
-    // Navigator.push(
-    //   _context!,
-    //   MaterialPageRoute(builder: (context) => exo_confirm_swap.ConfirmSwapExchange(statusNotifier: statusNotifier, swapResModel: lstTx?[indx], confirmSwap: exolixSwapping, getStatus: getStatus))
-    // );
   }
 
   @override
@@ -263,26 +238,26 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI, 
   }
 
   /// This function for update status inside details
-  Future<ExolixSwapResModel> getStatus() async {
+  Future<String> getStatus(int index) async {
 
-    // dialogLoading(_context!, content: "Checking Status");
+    dialogLoading(_context!, content: "Checking Status");
+    
+    await initListTx();
 
-    // await _exolixExchangeRepoImpl.getExolixExStatusByTxId(lstTx![index!].id!).then((value) {
+    await _exolixExchangeRepoImpl.getExolixExStatusByTxId(lstTx?[index]['id']).then((value) {
       
-    //   print("value ${json.decode(value.body)['status']}");
-    //   lstTx?[index!] = ExolixSwapResModel.fromJson(json.decode(value.body));
+      print("value ${json.decode(value.body)['status']}");
+      lstTx?[index]['status'] = json.decode(value.body)['status'];
 
-    //   print("getStatus ${lstTx?[index!].status}");
+    });
 
-    // });
+    await SecureStorageImpl().writeSecure(DbKey.lstExolicTxIds_key, json.encode(lstTx));
 
-    // await SecureStorageImpl().writeSecure(DbKey.lstExolicTxIds_key, json.encode(ExolixSwapResModel().toJson(lstTx!)));
+    // Close Dialog
+    Navigator.pop(_context!);
+    // return ExolixSwapResModel();
 
-    // // Close Dialog
-    // Navigator.pop(_context!);
-
-    // return lstTx![index!];
-    return ExolixSwapResModel();
+    return lstTx?[index]['status'];
   }
 
 }

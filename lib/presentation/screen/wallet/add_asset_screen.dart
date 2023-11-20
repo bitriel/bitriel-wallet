@@ -4,7 +4,7 @@ class AddAsset extends StatelessWidget {
 
   final int? index;
 
-  const AddAsset({super.key, this.index});
+  const AddAsset({super.key, this.index = 0});
 
   @override
   Widget build(BuildContext context) {

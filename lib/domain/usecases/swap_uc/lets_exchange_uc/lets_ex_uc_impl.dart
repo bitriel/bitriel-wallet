@@ -1,7 +1,7 @@
 import 'package:bitriel_wallet/domain/usecases/swap_uc/exchange.i.dart';
 import 'package:bitriel_wallet/index.dart';
 
-Map mapp = {
+Map<String, dynamic> mapp = {
   "transaction_id": "5bb4d99cd44a5",
   "status": "wait",
   "coin_from": "ETH",
@@ -52,6 +52,8 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
 
   int? index;
 
+  Map<String, dynamic>? jsn;
+
   set setContext(BuildContext ctx){
     _context = ctx;
     _paymentUcImpl.setBuildContext = ctx;
@@ -100,10 +102,10 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
       coinToIcon: jsn['coin_to_icon'],
 
       depositAddr: jsn['deposit'],
-      depositAmt: jsn['deposit_amount'].toString(),
+      depositAmt: jsn['withdrawal_amount'].toString(),
 
       status: jsn['status'],
-      withdrawalAmount: jsn['withdrawal_amount'].toString(),
+      withdrawalAmount: jsn['deposit_amount'].toString(),
 
       withdrawalAddress: jsn['withdrawal'],
       createdAt: jsn['created_at'],
@@ -114,6 +116,8 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
   Future<void> initListTx() async {
 
     await SecureStorageImpl().readSecure(DbKey.lstLetsExchangeTxIds)!.then((value) {
+
+      print("Value $value");
 
       if (value.isNotEmpty){
         lstTx = List<Map<String, dynamic>>.from(json.decode(value));
@@ -162,7 +166,7 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
     return await _letsExchangeRepoImpl.twoCoinInfo({
       "from": coin1.code,
       "to": coin2.code,
-      "amount": swapModel.amt!.value
+      "amount": swapModel.withdrawAmt!.value
     }).then((value) async {
       return (json.decode(value.body))['amount'];
     });
@@ -172,15 +176,13 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
   @override
   Future<ExChangeTxI> letsExchangeSwap(SwapModel swapModel) async {
 
-    print("letsExchangeSwap");
-
-    // await _letsExchangeRepoImpl.swap(swapModel.toJson()).then((value) async {
-    return await Future.delayed(const Duration(seconds: 1), () async {
+    return await _letsExchangeRepoImpl.swap(swapModel.toJson()).then((value) async {
+    // return await Future.delayed(const Duration(seconds: 1), () async {
 
     // });
     
     // return Response(json.encode(map), 200).then((value) async {
-      Response value = Response(json.encode(mapp), 200);
+      // Response value = Response(json.encode(mapp), 200);
 
       if (value.statusCode == 401){
         throw json.decode(value.body)['error'];
@@ -197,11 +199,11 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
 
         await initListTx();
 
-        Map<String, dynamic> jsn = json.decode(value.body);
+        jsn = mapp;//json.decode(value.body);
 
-        jsn.addAll({"created_at": DateTime.now().toUtc().toString().replaceAll(" ", "T")});
+        jsn!.addAll({"created_at": DateTime.now().toUtc().toString().replaceAll(" ", "T")});
 
-        lstTx.add(jsn);
+        lstTx.add(jsn!);
         
         await SecureStorageImpl().writeSecure(DbKey.lstLetsExchangeTxIds, json.encode(lstTx));
 
@@ -224,7 +226,7 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
         throw json.decode(value.body);
       }
     });
-    
+    // return Future.delayed(const Duration(seconds: 200), () => fromJson(mapp));
   }
 
   // Index Of List
@@ -296,23 +298,25 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
   }
 
   /// This function for update status inside details
-  Future<SwapResModel> getStatus() async {
+  Future<String> getStatus(int index) async {
     
-    // dialogLoading(_context!, content: "Checking Status");
+    dialogLoading(_context!, content: "Checking Status");
 
-    // await _letsExchangeRepoImpl.getLetsExStatusByTxId(lstTx![index!].transaction_id!).then((value) {
+    await initListTx();
+
+    await _letsExchangeRepoImpl.getLetsExStatusByTxId(lstTx[index]['transaction_id']).then((value) {
       
-    //   lstTx![index!] = SwapResModel.fromJson(jsn);
+      lstTx[index]['status'] = json.decode(value.body)['status'];
 
-    // });
+    });
 
-    // await SecureStorageImpl().writeSecure(DbKey.lstTxIds, json.encode(SwapResModel().toJson(lstTx!)));
+    await SecureStorageImpl().writeSecure(DbKey.lstLetsExchangeTxIds, json.encode(lstTx));
 
-    // // Close Dialog
-    // Navigator.pop(_context!);
+    // Close Dialog
+    Navigator.pop(_context!);
 
-    // return lstTx![index!];
-    return SwapResModel();
+    return lstTx[index]['status'];
+
   }
 
 }

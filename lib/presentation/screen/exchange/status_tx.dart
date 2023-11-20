@@ -165,20 +165,33 @@ class StatusExolixExchange extends StatelessWidget {
           textAlign: TextAlign.start,
         ),
         subtitle: MyTextConstant(
-          text: "Status: ${lstTx[index].createdAt == null ? '' : tzToDateTime(lstTx[index].createdAt!)}",
+          text: lstTx[index].createdAt == null ? '' : tzToDateTime(lstTx[index].createdAt!),
           color2: hexaCodeToColor(AppColors.iconGreyColor),
           textAlign: TextAlign.start,
         ),
-        trailing: ValueListenableBuilder(
-          valueListenable: ValueNotifier(false),
-          builder: (context, statusNotifier, wg) {
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
 
-            return MyTextConstant(
-              text: "Status: ${lstTx[index].status!}",
-              color2: hexaCodeToColor(AppColors.primary),
+            const MyTextConstant(
+              text: "Status",
               textAlign: TextAlign.end,
-            );
-          }
+              fontWeight: FontWeight.bold,
+            ),
+
+            ValueListenableBuilder(
+              valueListenable: exchangeUcImpl.statusNotifier,
+              builder: (context, statusNotifier, wg) {
+
+                return MyTextConstant(
+                  text: lstTx[index].status!,
+                  color2: hexaCodeToColor(AppColors.primary),
+                  textAlign: TextAlign.end,
+                );
+              }
+            )
+          ],
         ),
       ),
     );
