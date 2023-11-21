@@ -64,80 +64,82 @@ class SwapScreen extends StatelessWidget {
           
         ],
       ),
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(10))
-                ),
-                child: Column(
-                  children: [
-
-                    _payInput(context, _exchangeUcImpl),
-
-                    const SizedBox(height: 10),
-
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: IconButton(
-                        onPressed: (){
-                          
-                        },
-                        icon: Icon(Iconsax.refresh_circle, size: 35, color: hexaCodeToColor(AppColors.orangeColor),)
+      body: SingleChildScrollView(
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+        
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(10))
+                  ),
+                  child: Column(
+                    children: [
+        
+                      _payInput(context, _exchangeUcImpl),
+        
+                      const SizedBox(height: 10),
+        
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: IconButton(
+                          onPressed: (){
+                            
+                          },
+                          icon: Icon(Iconsax.refresh_circle, size: 35, color: hexaCodeToColor(AppColors.orangeColor),)
+                        ),
                       ),
-                    ),
-                  
-                    _getDisplay(context, _exchangeUcImpl),
-
-                  ],
+                    
+                      _getDisplay(context, _exchangeUcImpl),
+        
+                    ],
+                  ),
                 ),
               ),
-            ),
-
-            AnimatedToggle(
-              values: const ["Exolix", "Let's Exchange"],
-              onToggleCallback: _exchangeUcImpl.switchExchange,
-              buttonColor: hexaCodeToColor(AppColors.primaryBtn),
-              backgroundColor: hexaCodeToColor(AppColors.primaryBtn).withOpacity(0.2),
-              textColor: Colors.white,
-            ),
-
-            Expanded(
-              child: Container()
-            ),
-
-            Center(
-              child: _buildNumberPad(context, _exchangeUcImpl.swapModel.withdrawAmt!.value, _exchangeUcImpl.onDeleteTxt, _exchangeUcImpl.formatDouble)
-            ),
-
-            // Swap Button
-            SafeArea(
-              child: ValueListenableBuilder(
-                valueListenable: _exchangeUcImpl.isBtn,
-                builder: (context, isBtn, wg) {
-            
-                  return MyButton(
-                    edgeMargin: const EdgeInsets.all(paddingSize),
-                    textButton: "Swap",
-                    buttonColor: isBtn == false ? AppColors.greyCode : AppColors.primaryBtn,
-                    action: isBtn == false ? null : 
-                    () async {
-                      await _exchangeUcImpl.swap();
-                    },
-                  );
-                }
+        
+              AnimatedToggle(
+                values: const ["Exolix", "Let's Exchange"],
+                onToggleCallback: _exchangeUcImpl.switchExchange,
+                buttonColor: hexaCodeToColor(AppColors.primaryBtn),
+                backgroundColor: hexaCodeToColor(AppColors.primaryBtn).withOpacity(0.2),
+                textColor: Colors.white,
               ),
-            ),
-      
-          ],
+        
+              Expanded(
+                child: Container()
+              ),
+        
+              Center(
+                child: _buildNumberPad(context, _exchangeUcImpl.swapModel.withdrawAmt!.value, _exchangeUcImpl.onDeleteTxt, _exchangeUcImpl.formatDouble)
+              ),
+        
+              // Swap Button
+              SafeArea(
+                child: ValueListenableBuilder(
+                  valueListenable: _exchangeUcImpl.isBtn,
+                  builder: (context, isBtn, wg) {
+              
+                    return MyButton(
+                      edgeMargin: const EdgeInsets.all(paddingSize),
+                      textButton: "Swap",
+                      buttonColor: isBtn == false ? AppColors.greyCode : AppColors.primaryBtn,
+                      action: isBtn == false ? null : 
+                      () async {
+                        await _exchangeUcImpl.swap();
+                      },
+                    );
+                  }
+                ),
+              ),
+              
+            ],
+          ),
         ),
       ),
     );
@@ -246,8 +248,8 @@ class SwapScreen extends StatelessWidget {
                                 if(leUCImpl.coin1 != null)
                                 Container(
                                   margin: const EdgeInsets.symmetric(horizontal: 10),
-                                  height: 40, 
-                                  width: 40, 
+                                  height: 30, 
+                                  width: 30, 
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(50), 
                                     child: leUCImpl.coin1!.icon!.contains('.svg') ? SvgPicture.network(leUCImpl.coin1!.icon!) : Image.network(leUCImpl.coin1!.icon!)
@@ -270,7 +272,7 @@ class SwapScreen extends StatelessWidget {
                                     ),
 
                                     if (leUCImpl.coin1 != null) Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                      padding: const EdgeInsets.symmetric(horizontal: 10),
                                       decoration: BoxDecoration(
                                         color: leUCImpl.coin1!.shortName == "BEP20" ? Colors.cyanAccent : const Color.fromARGB(255, 96, 237, 169),
                                         borderRadius: BorderRadius.circular(10)
@@ -278,7 +280,7 @@ class SwapScreen extends StatelessWidget {
                                       child: MyTextConstant(
                                         text: leUCImpl.coin1!.shortName ?? 'Native',
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 12,
+                                        fontSize: 10,
                                         textAlign: TextAlign.start,
                                       ),
                                     )
@@ -416,8 +418,8 @@ class SwapScreen extends StatelessWidget {
                                 if(leUCImpl.coin2 != null)
                                 Container(
                                   margin: const EdgeInsets.symmetric(horizontal: 10),
-                                  height: 40, 
-                                  width: 40, 
+                                  height: 30, 
+                                  width: 30, 
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(50), 
                                     child: leUCImpl.coin2!.icon!.contains('.svg') ? SvgPicture.network(leUCImpl.coin2!.icon!) : Image.network(leUCImpl.coin2!.icon!)

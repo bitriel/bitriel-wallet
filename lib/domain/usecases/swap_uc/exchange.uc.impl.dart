@@ -33,12 +33,14 @@ class ExchangeUcImpl<T> {
 
   final SecureStorageImpl _secureStorageImpl = SecureStorageImpl();
 
+  SwapModel swapModel = SwapModel();
+
   BuildContext? _context;
 
   // defaultLstCoins
   List<ExchangeCoinI>? defaultLstCoins;
 
-  SwapModel swapModel = SwapModel();
+  TextEditingController searchController = TextEditingController();
 
   int index = -1;
 
@@ -50,14 +52,17 @@ class ExchangeUcImpl<T> {
 
   void initExchangeState() async {
     
-    exchanges = [
-      Exchange(title: 'Exolix', confirmSwap: confirmSwap, instance: exolicUCImpl, storageKey: DbKey.lstExolicTxIds_key, getCoins: exolicUCImpl.getCoins, rate: exolicUCImpl.rate, swap: exolicUCImpl.exolixSwap, getStatus: exolicUCImpl.getStatus),
-      Exchange(title: 'LetsExchange', confirmSwap: confirmSwap, instance: letsExchangeUCImpl, storageKey: DbKey.lstLetsExchangeTxIds, getCoins: letsExchangeUCImpl.getCoins, rate: letsExchangeUCImpl.rate, swap: letsExchangeUCImpl.letsExchangeSwap, getStatus: letsExchangeUCImpl.getStatus) 
-    ];
+    if (exchanges == null){
+      exchanges = [
+        Exchange(title: 'Exolix', confirmSwap: confirmSwap, instance: exolicUCImpl, storageKey: DbKey.lstExolicTxIds_key, getCoins: exolicUCImpl.getCoins, rate: exolicUCImpl.rate, swap: exolicUCImpl.exolixSwap, getStatus: exolicUCImpl.getStatus),
+        Exchange(title: 'LetsExchange', confirmSwap: confirmSwap, instance: letsExchangeUCImpl, storageKey: DbKey.lstLetsExchangeTxIds, getCoins: letsExchangeUCImpl.getCoins, rate: letsExchangeUCImpl.rate, swap: letsExchangeUCImpl.letsExchangeSwap, getStatus: letsExchangeUCImpl.getStatus) 
+      ];
 
-    isExchangeStateReady.value = true;
-    
-    await getExchangeCoins();
+      isExchangeStateReady.value = true;
+      
+      await getExchangeCoins();
+
+    }
 
   }
 
@@ -155,7 +160,7 @@ class ExchangeUcImpl<T> {
 
         if (isFrom == true){
 
-          coin1 = exchanges![currentIndex.value].coins[res];
+          coin1 = res;
           swapModel.from = coin1!.code;
           swapModel.networkFrom = coin1!.network;
 
@@ -164,7 +169,7 @@ class ExchangeUcImpl<T> {
 
         } else {
 
-          coin2 = exchanges![currentIndex.value].coins[res];
+          coin2 = res;
           swapModel.to = coin2!.code;
           swapModel.networkTo = coin2!.network;
 
@@ -343,35 +348,56 @@ class ExchangeUcImpl<T> {
     }
   }
 
-  String? onSearched(String? value){
+  void initSearch(List<ExchangeCoinI> coin){
+
+    searchController.clear();
+
+    searchController.addListener(() {
+      onSearched(searchController.text, coin);
+    });
+
+    searched = null;
+
+  }
+
+  void onSearched(String? value, List<ExchangeCoinI> coins){
 
     print("onSearched $value");
 
+    searched = null;
+
     // EasyDebounce.debounce("search", const Duration(milliseconds: 600), () {
       
-      // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-      // isSearching.value = true;
-      
-      // searched = exchanges![currentIndex.value].coins.map((element) {
-      //   if (value!.toLowerCase() == element.code!.toLowerCase()) return element;
-      // }).cast<ExchangeCoinI>().toList();
-      exchanges![currentIndex.value].coins.every((element) {
+      if (value!.isNotEmpty){
+          // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
+        isSearching.value = true;
+        
+        // searched = exchanges![currentIndex.value].coins.map((element) {
+        //   if (value!.toLowerCase() == element.code!.toLowerCase()) return element;
+        // }).cast<ExchangeCoinI>().toList();
+        print("currentIndex.value ${currentIndex.value}");
+        print("exchanges![currentIndex.value].coins ${coins.length}");
+        searched = coins.where((element) {
 
-          print("value!.toLowerCase() ${value!.toLowerCase()}");
-          print("element.code!.toLowerCase() ${element.code!.toLowerCase()}");
-        if (value!.toLowerCase() == element.code!.toLowerCase()) {
-          print("value!.toLowerCase() ${value.toLowerCase()}");
-          print("element.code!.toLowerCase() ${element.code!.toLowerCase()}");
-        }
-        return false;
-      });
-      
-      // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-      // isSearching.value = false;
+          if (element.coinName!.toLowerCase().contains(value.toLowerCase())) {
+            return true;
+          }
+          return false;
+        }).toList();
+
+        print("searched ${searched!.length}");
+        
+        // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
+        isSearching.value = false;
+      } else {
+
+        // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
+        isSearching.notifyListeners();
+      }
       
     // });
 
-    return value;
+    // return value;
   }
 
   void resetState() {

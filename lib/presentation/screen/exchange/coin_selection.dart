@@ -9,26 +9,24 @@ class SelectSwapToken extends StatelessWidget {
   final ExchangeCoinI? coin1;
   final ExchangeCoinI? coin2;
 
-  SelectSwapToken({
+  const SelectSwapToken({
     super.key, required this.coin,
     required this.coin1,
     required this.coin2,
     required this.exchangeUcImpl
   });
 
-  final TextEditingController searchController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
 
-    exchangeUcImpl!.searched = null;
+    exchangeUcImpl!.initSearch(coin);
 
     return Scaffold(
       appBar: appBar(context, title: "Select Token"),
       body: Column(
         children: [
       
-          _searchBar(searchController, coin, exchangeUcImpl!.onSearched,),
+          _searchBar(exchangeUcImpl!.searchController, coin),
 
           Expanded(
             child: Stack(
@@ -39,7 +37,7 @@ class SelectSwapToken extends StatelessWidget {
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
 
-                    return _listTokenItem(context, index, coin1, coin2);
+                    return ListTokenItem(coin: coin, index: index, coin1: coin1, coin2: coin2);
                     
                   },
                 ),
@@ -60,18 +58,19 @@ class SelectSwapToken extends StatelessWidget {
                       );
                     }
 
+                    print("Searched ${exchangeUcImpl!.searched ?? 'null'}");
+
                     return Container(
                       width: MediaQuery.of(context).size.width,
-                      color: Colors.white,
-                      child: Expanded(
-                        child: ListView.builder(
-                          itemCount: exchangeUcImpl!.searched!.length,
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) {
+                      height: MediaQuery.of(context).size.height,
+                      color: Colors.red,
+                      child: ListView.builder(
+                        itemCount: exchangeUcImpl!.searched!.length,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
                     
-                            return _listTokenItem(context, index, coin1, coin2);
-                          },
-                        ),
+                          return ListTokenItem(coin: exchangeUcImpl!.searched!, index: index, coin1: coin1, coin2: coin2);
+                        },
                       ),
                     );
                   }
@@ -85,7 +84,7 @@ class SelectSwapToken extends StatelessWidget {
     );
   }
 
-  Widget _searchBar(TextEditingController searchController, List<ExchangeCoinI> coin, Function(String)? onSearched) {
+  Widget _searchBar(TextEditingController searchController, List<ExchangeCoinI> coin) {
     return Padding(
       padding: const EdgeInsets.only(top: 15 / 2, left: 15, right: 15, bottom: 15 / 2),
       child: TextField(
@@ -108,8 +107,7 @@ class SelectSwapToken extends StatelessWidget {
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50.0),
           ),
-        ),
-        onChanged: onSearched,
+        )
       ),
     );
   }
@@ -137,7 +135,23 @@ class SelectSwapToken extends StatelessWidget {
     // }
   }
 
-  Widget _listTokenItem(BuildContext context, int index, ExchangeCoinI? coin1, ExchangeCoinI? coin2) {
+  
+}
+
+class ListTokenItem extends StatelessWidget {
+
+  final int index;
+
+  final List<ExchangeCoinI> coin;
+
+  final ExchangeCoinI? coin1;
+
+  final ExchangeCoinI? coin2;
+
+  const ListTokenItem({super.key, required this.coin, required this.index, required this.coin1, required this.coin2});  
+
+  @override
+  Widget build(BuildContext context){
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 20.0),
       leading: SizedBox(
@@ -188,7 +202,7 @@ class SelectSwapToken extends StatelessWidget {
       onTap: 
       // coin1 != null || coin2 != null ? null : 
       () {
-        Navigator.pop(context, index);
+        Navigator.pop(context, coin[index]);
       },
     );
   }
