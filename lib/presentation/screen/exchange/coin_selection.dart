@@ -60,10 +60,9 @@ class SelectSwapToken extends StatelessWidget {
 
                     print("Searched ${exchangeUcImpl!.searched ?? 'null'}");
 
-                    return Container(
+                    return SizedBox(
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
-                      color: Colors.red,
                       child: ListView.builder(
                         itemCount: exchangeUcImpl!.searched!.length,
                         shrinkWrap: true,
