@@ -28,7 +28,9 @@ class TokenPayment extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: hexaCodeToColor(AppColors.background),
-      appBar: appBar(context, title: "Send"),
+      appBar: appBar(context, title: "Send", dispose: (){
+        Navigator.pop(context, paymentUcImpl.isPaySuccess);
+      }),
       body: Form(
         autovalidateMode: AutovalidateMode.onUserInteraction,
         child: Column(

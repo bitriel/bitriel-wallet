@@ -6,6 +6,8 @@ import 'package:pinput/pinput.dart';
 
 class PaymentUcImpl implements PaymentUsecases {
 
+  bool isPaySuccess = false;
+
   TextEditingController recipientController = TextEditingController();
   
   TextEditingController amountController = TextEditingController();
@@ -141,8 +143,6 @@ class PaymentUcImpl implements PaymentUsecases {
       
         dialogLoading(context!);
 
-        print("walletProvider!.sortListContract![index.value].isNative ${walletProvider!.sortListContract![index.value].isNative}");
-
         // Catch Wrong Pin 
         // And throw To Main Error Handler
         try {
@@ -210,6 +210,8 @@ class PaymentUcImpl implements PaymentUsecases {
 
             addTrxHistory();
           }
+
+          isPaySuccess = true;
           
           // Save Trx Into Local Storage
           await walletProvider!.storeAssets();
@@ -266,8 +268,7 @@ class PaymentUcImpl implements PaymentUsecases {
 
   /// Send Token: BTC, SEL...
   Future<void> sendNative() async {
-    print("sendNative");
-    print(recipientController.text.toLowerCase().contains("se"));
+    
     if (recipientController.text.toLowerCase().contains("se")){
 
       // Send SEL

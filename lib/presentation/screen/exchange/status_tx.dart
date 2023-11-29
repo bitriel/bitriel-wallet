@@ -44,6 +44,7 @@ class StatusExolixExchange extends StatelessWidget {
                   shrinkWrap: true,
                   children: exchangeUcImpl!.exchanges![tabBarIndex].tx.reversed.map((e) {
                     return _statusSwapRes(
+                      context: context,
                       exchangeUcImpl: exchangeUcImpl!,
                       lstTx: List<ExChangeTxI>.from(exchangeUcImpl!.exchanges![tabBarIndex].tx),
                       index: exchangeUcImpl!.exchanges![tabBarIndex].tx.indexOf(e) 
@@ -52,98 +53,6 @@ class StatusExolixExchange extends StatelessWidget {
                 );
               }
             )
-            // TabBarView(
-            //   children: [
-
-            //     ListView(
-            //       shrinkWrap: true,
-            //       children: exchangeUcImpl!.exchanges![exchangeUcImpl!.currentIndex.value].tx.reversed.map((e) {
-            //         return _statusSwapRes(
-            //           exchangeUcImpl: exchangeUcImpl!,
-            //           lstTx: exchangeUcImpl!.exchanges![exchangeUcImpl!.currentIndex.value].tx,
-            //           index: exchangeUcImpl!.exchanges![exchangeUcImpl!.currentIndex.value].tx.indexOf(e) 
-            //         );
-            //       }).toList(),
-            //     ),
-            //     ListView(
-            //       shrinkWrap: true,
-            //       children: exchangeUcImpl!.exchanges![exchangeUcImpl!.tabBarIndex].tx.reversed.map((e) {
-            //         return _statusSwapRes(
-            //           exchangeUcImpl: exchangeUcImpl!,
-            //           lstTx: exchangeUcImpl!.exchanges![exchangeUcImpl!.currentIndex].tx,
-            //           index: exchangeUcImpl!.exchanges![exchangeUcImpl!.currentIndex].tx.indexOf(e) 
-            //         );
-            //       }).toList(),
-            //     )
-
-            //   ]
-            // )
-    
-            // ValueListenableBuilder(
-            //   valueListenable: exchangeUcImpl!.isReady,
-            //   builder: (context, lst, wg) {
-    
-            //     if (exchangeUcImpl!.lstTx!.isEmpty){
-            //       return Center(
-            //         child: Column(
-            //           crossAxisAlignment: CrossAxisAlignment.center,
-            //           mainAxisAlignment: MainAxisAlignment.center,
-            //           children: [
-                  
-            //             Padding(
-            //               padding: const EdgeInsets.only(top: 150),
-            //               child: Lottie.asset(
-            //                 "assets/animation/search_empty.json",
-            //                 repeat: false,
-            //                 height: 200,
-            //                 width: 200
-            //               ),
-            //             ),
-                  
-            //             const MyTextConstant(
-            //               text: "No request exchange activity.",
-            //               fontSize: 20,
-            //               fontWeight: FontWeight.bold,
-            //             )
-                  
-            //           ],
-            //         ),
-            //       );
-            //     }
-    
-            //     // ignore: curly_braces_in_flow_control_structures, unnecessary_null_comparison
-            //     else if (lst == null) return Expanded(
-            //       child: Shimmer.fromColors(
-            //         baseColor: Colors.grey[300]!,
-            //         highlightColor: Colors.grey[100]!,
-            //         child: ListView.builder(
-            //         itemCount: 6,
-            //         itemBuilder: (context, index) {
-            //           return Card(
-            //           elevation: 1.0,
-            //           shape: RoundedRectangleBorder(
-            //             borderRadius: BorderRadius.circular(16),
-            //           ),
-            //           child: const SizedBox(height: 80),
-            //           );
-            //         },
-            //         ),
-            //       )
-            //     );
-                
-            //     return 
-            // ListView(
-            //       shrinkWrap: true,
-            //       children: exchangeUcImpl!.exchanges![exchangeUcImpl!.currentIndex.value].tx.reversed.map((e) {
-            //         return _statusSwapRes(
-            //           exchangeUcImpl: exchangeUcImpl!,
-            //           lstTx: exchangeUcImpl!.exchanges![exchangeUcImpl!.currentIndex.value].tx,
-            //           index: exchangeUcImpl!.exchanges![exchangeUcImpl!.currentIndex.value].tx.indexOf(e) 
-            //         );
-            //       }).toList(),
-            //     )
-              // }
-            // )
     
           ],
         ),
@@ -151,7 +60,7 @@ class StatusExolixExchange extends StatelessWidget {
     );
   }
 
-  Widget _statusSwapRes({required ExchangeUcImpl exchangeUcImpl, required List<ExChangeTxI> lstTx, int? index}) {
+  Widget _statusSwapRes({BuildContext? context, required ExchangeUcImpl exchangeUcImpl, required List<ExChangeTxI> lstTx, int? index}) {
     
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),

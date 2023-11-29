@@ -142,10 +142,10 @@ class ExchangeUcImpl<T> {
     });
   }
 
-  void setCoin(BuildContext context, bool isFrom){
+  void setCoin(bool isFrom){
 
     Navigator.push(
-      context,
+      _context!,
       MaterialPageRoute(
         builder: (context) => SelectSwapToken(
           coin: exchanges![currentIndex.value].coins,
@@ -280,6 +280,7 @@ class ExchangeUcImpl<T> {
       MaterialPageRoute(builder: (context) => ConfirmSwapExchange(
         exchangeName: exchanges![tabBarIndex.value].title!,
         index: indx,
+        exchangeUcImpl: this,
         statusNotifier: statusNotifier, 
         exChangeTxI: exchanges![tabBarIndex.value].tx[indx], 
         confirmSwap: swapping, 
@@ -288,29 +289,29 @@ class ExchangeUcImpl<T> {
     );
   }
 
-  Future<void> paySwap(int index) async {
+  // Future<void> paySwap(int index) async {
     
-    Navigator.push(
-      _context!,
-      MaterialPageRoute(builder: (context) => const PincodeScreen(title: '', label: PinCodeLabel.fromSendTx,))
-    ).then((value) async {
+  //   Navigator.push(
+  //     _context!,
+  //     MaterialPageRoute(builder: (context) => const PincodeScreen(title: '', label: PinCodeLabel.fromSendTx,))
+  //   ).then((value) async {
 
-      // _paymentUcImpl.recipientController.text = lstTx![index].depositAddress!;
-      // _paymentUcImpl.amountController.text = lstTx![index].amount!;
+  //     // _paymentUcImpl.recipientController.text = lstTx![index].depositAddress!;
+  //     // _paymentUcImpl.amountController.text = lstTx![index].amount!;
 
-      if (value != null){
-        // await _paymentUcImpl.sendBep20();
-      }
+  //     if (value != null){
+  //       // await _paymentUcImpl.sendBep20();
+  //     }
 
-    });
+  //   });
 
-  }
+  // }
 
-  Future<void> swapping(ExChangeTxI tx) async {
+  Future<void> swapping(ExChangeTxI tx, int statusIndex) async {
     
     print("swapping");
     
-    int index = Provider.of<WalletProvider>(_context!, listen: false).sortListContract!.indexWhere((model) {
+    int indexFound = Provider.of<WalletProvider>(_context!, listen: false).sortListContract!.indexWhere((model) {
       
       if ( tx.coinFrom!.toLowerCase() == model.symbol!.toLowerCase() ){
         return true;
@@ -320,12 +321,23 @@ class ExchangeUcImpl<T> {
 
     });
 
-    if (index != -1){
+    if (indexFound != -1){
 
-      await Navigator.pushReplacement(
+      await Navigator.push(
         _context!,
         MaterialPageRoute(builder: (context) => TokenPayment(index: index, address: tx.depositAddr, amt: tx.withdrawalAmount,))
-      );
+      ).then((res) async {
+        if (res != null && res == true){
+
+          print("Res $res");
+
+          (exchanges![tabBarIndex.value].tx[index] as ExChangeTxI).status = await exchanges![tabBarIndex.value].getStatus(statusIndex);
+          
+          // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
+          statusNotifier.notifyListeners();
+          
+        }
+      });
       
     } else {
       
@@ -362,42 +374,30 @@ class ExchangeUcImpl<T> {
 
   void onSearched(String? value, List<ExchangeCoinI> coins){
 
-    print("onSearched $value");
-
     searched = null;
-
-    // EasyDebounce.debounce("search", const Duration(milliseconds: 600), () {
       
-      if (value!.isNotEmpty){
-          // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-        isSearching.value = true;
-        
-        // searched = exchanges![currentIndex.value].coins.map((element) {
-        //   if (value!.toLowerCase() == element.code!.toLowerCase()) return element;
-        // }).cast<ExchangeCoinI>().toList();
-        print("currentIndex.value ${currentIndex.value}");
-        print("exchanges![currentIndex.value].coins ${coins.length}");
-        searched = coins.where((element) {
-
-          if (element.coinName!.toLowerCase().contains(value.toLowerCase())) {
-            return true;
-          }
-          return false;
-        }).toList();
-
-        print("searched ${searched!.length}");
-        
+    if (value!.isNotEmpty){
         // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-        isSearching.value = false;
-      } else {
-
-        // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-        isSearching.notifyListeners();
-      }
+      isSearching.value = true;
       
-    // });
+      searched = coins.where((element) {
 
-    // return value;
+        if (element.coinName!.toLowerCase().contains(value.toLowerCase())) {
+          return true;
+        }
+        return false;
+      }).toList();
+
+      print("searched ${searched!.length}");
+      
+      // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
+      isSearching.value = false;
+    } else {
+
+      // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
+      isSearching.notifyListeners();
+    }
+
   }
 
   void resetState() {

@@ -13,8 +13,12 @@ PreferredSizeWidget appBar(final BuildContext context, {required final String ti
     ),
     leading: IconButton(
       onPressed: () {
-        if (dispose != null) dispose();
-        Navigator.pop(context);
+        if (dispose != null) {
+          dispose();
+        }
+        else {
+          Navigator.pop(context);
+        }
       },
       icon: Icon(
         Iconsax.arrow_left_2,

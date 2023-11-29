@@ -4,6 +4,6 @@ abstract class ExolixExchangeUseCases {
   
   Future<void> getExolixExchangeCoin();
   Future<void> exolixSwap(SwapModel swapModel);
-  Future<void> exolixSwapping(ExolixSwapResModel swapResModel);
+  // Future<void> exolixSwapping(ExolixSwapResModel swapResModel);
   
 }

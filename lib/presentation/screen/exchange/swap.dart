@@ -226,7 +226,7 @@ class SwapScreen extends StatelessWidget {
                   
                   : InkWell(
                     onTap: (){
-                      if (isReady == true) leUCImpl.setCoin(context, true);
+                      if (isReady == true) leUCImpl.setCoin(true);
                     },
                     child: SizedBox(
                       width: MediaQuery.of(context).size.width / 2.20,
@@ -395,7 +395,7 @@ class SwapScreen extends StatelessWidget {
 
                       if (isReady == true){
 
-                        leUCImpl.setCoin(context, false);
+                        leUCImpl.setCoin(false);
                       }
                     },
                     child: SizedBox(

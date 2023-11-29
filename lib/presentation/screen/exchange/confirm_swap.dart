@@ -1,4 +1,5 @@
 import 'package:bitriel_wallet/domain/usecases/swap_uc/exchange.i.dart';
+import 'package:bitriel_wallet/domain/usecases/swap_uc/exchange.uc.impl.dart';
 import 'package:bitriel_wallet/index.dart';
 
 class ConfirmSwapExchange extends StatelessWidget {
@@ -6,6 +7,8 @@ class ConfirmSwapExchange extends StatelessWidget {
   final String exchangeName;
 
   final int? index;
+
+  final ExchangeUcImpl? exchangeUcImpl;
 
   final ValueNotifier<bool>? statusNotifier;
 
@@ -15,7 +18,7 @@ class ConfirmSwapExchange extends StatelessWidget {
 
   final Function? getStatus;
   
-  const ConfirmSwapExchange({required this.exchangeName, required this.index, required this.statusNotifier, super.key, required this.exChangeTxI, required this.confirmSwap, this.getStatus});
+  const ConfirmSwapExchange({required this.exchangeName, required this.exchangeUcImpl, required this.index, required this.statusNotifier, super.key, required this.exChangeTxI, required this.confirmSwap, this.getStatus});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +30,7 @@ class ConfirmSwapExchange extends StatelessWidget {
       
           _swapTokenInfo(exChangeTxI),
 
-          _trxExchangeInfo(context, exChangeTxI, getStatus!),
+          _trxExchangeInfo(context, exchangeUcImpl!.exchanges![exchangeUcImpl!.currentIndex.value].tx[index!] , getStatus!),
 
           Expanded(
             child: Container()
@@ -43,7 +46,7 @@ class ConfirmSwapExchange extends StatelessWidget {
                 edgeMargin: const EdgeInsets.all(paddingSize),
                 textButton: "Confirm",
                 action: (){
-                  confirmSwap!(exChangeTxI);
+                  confirmSwap!(exChangeTxI, index);
                 },
               );
               

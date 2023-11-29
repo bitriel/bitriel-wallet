@@ -2,7 +2,6 @@ import 'package:bitriel_wallet/data/repository/exolix_ex_repo/exolix_ex_repo_imp
 import 'package:bitriel_wallet/domain/usecases/swap_uc/exchange.i.dart';
 import 'package:bitriel_wallet/domain/usecases/swap_uc/exolix_uc/exolix_ex_uc.dart';
 import 'package:bitriel_wallet/index.dart';
-import 'package:bitriel_wallet/presentation/screen/exchange/confirm_swap.dart';
 
 Map map = {"id":"ex5ec4c12c76d7","amount":1,"amountTo":752.47824881,"coinFrom":{"coinCode":"ETH","coinName":"Ethereum","network":"ETH","networkName":"Ethereum","networkShortName":"ERC20","icon":"https://exolix.com/icons/coins/ETH.png","memoName":""},"coinTo":{"coinCode":"CAKE","coinName":"PancakeSwap","network":"BSC","networkName":"BNB Smart Chain (BEP20)","networkShortName":"BEP20","icon":"https://exolix.com/icons/coins/CAKE.png","memoName":""},"comment":null,"createdAt":"2023-11-16T07:41:32.682Z","depositAddress":"0xC1AA43D509ea7f840DDeC6721f6601E552a3803b","depositExtraId":null,"withdrawalAddress":"0xe11175d356d20b70abcec858c6b82b226e988941","withdrawalExtraId":null,"refundAddress":"0xe11175d356d20b70abcec858c6b82b226e988941","refundExtraId":null,"hashIn":{"hash":null,"link":null},"hashOut":{"hash":null,"link":null},"rate":752.47824881,"rateType":"fixed","affiliateToken":null,"status":"wait","source":"api","email":null};
 
@@ -196,46 +195,46 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI, 
     
   }
 
-  @override
-  Future<void> exolixSwapping(ExolixSwapResModel swapResModel) async {
+  // @override
+  // Future<void> exolixSwapping(ExolixSwapResModel swapResModel) async {
     
-    int index = Provider.of<WalletProvider>(_context!, listen: false).sortListContract!.indexWhere((model) {
+  //   int index = Provider.of<WalletProvider>(_context!, listen: false).sortListContract!.indexWhere((model) {
       
-      if ( swapResModel.coinFrom!.coinCode!.toLowerCase() == model.symbol!.toLowerCase() ){
-        return true;
-      }
+  //     if ( swapResModel.coinFrom!.coinCode!.toLowerCase() == model.symbol!.toLowerCase() ){
+  //       return true;
+  //     }
 
-      return false;
+  //     return false;
 
-    });
+  //   });
 
-    if (index != -1){
+  //   if (index != -1){
 
-      await Navigator.pushReplacement(
-        _context!,
-        MaterialPageRoute(builder: (context) => TokenPayment(index: index, address: swapResModel.depositAddress, amt: swapResModel.amount,))
-      );
+  //     await Navigator.pushReplacement(
+  //       _context!,
+  //       MaterialPageRoute(builder: (context) => TokenPayment(index: index, address: swapResModel.depositAddress, amt: swapResModel.amount,))
+  //     );
       
-    } else {
+  //   } else {
       
-      await QuickAlert.show(
-        context: _context!,
-        type: QuickAlertType.warning,
-        showCancelBtn: true,
-        cancelBtnText: "Close",
-        cancelBtnTextStyle: TextStyle(fontSize: 14, color: hexaCodeToColor(AppColors.primaryBtn)),
-        text: '${swapResModel.coinFrom!.coinCode!} (${swapResModel.coinFrom!.network}) is not found. Please add contract token !',
-        confirmBtnText: 'Add Contract',
-        onConfirmBtnTap: (){
-          Navigator.pushReplacement(
-            _context!, 
-            MaterialPageRoute(builder: (context) => AddAsset(index: swapResModel.coinFrom!.network == "BSC" ? 0 : 1,))
-          );
-        }
-      );
+  //     await QuickAlert.show(
+  //       context: _context!,
+  //       type: QuickAlertType.warning,
+  //       showCancelBtn: true,
+  //       cancelBtnText: "Close",
+  //       cancelBtnTextStyle: TextStyle(fontSize: 14, color: hexaCodeToColor(AppColors.primaryBtn)),
+  //       text: '${swapResModel.coinFrom!.coinCode!} (${swapResModel.coinFrom!.network}) is not found. Please add contract token !',
+  //       confirmBtnText: 'Add Contract',
+  //       onConfirmBtnTap: (){
+  //         Navigator.pushReplacement(
+  //           _context!, 
+  //           MaterialPageRoute(builder: (context) => AddAsset(index: swapResModel.coinFrom!.network == "BSC" ? 0 : 1,))
+  //         );
+  //       }
+  //     );
 
-    }
-  }
+  //   }
+  // }
 
   /// This function for update status inside details
   Future<String> getStatus(int index) async {
@@ -246,7 +245,6 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI, 
 
     await _exolixExchangeRepoImpl.getExolixExStatusByTxId(lstTx?[index]['id']).then((value) {
       
-      print("value ${json.decode(value.body)['status']}");
       lstTx?[index]['status'] = json.decode(value.body)['status'];
 
     });
