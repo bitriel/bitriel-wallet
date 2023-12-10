@@ -179,11 +179,11 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI, 
           showCancelBtn: true,
           cancelBtnText: "Close",
           cancelBtnTextStyle: TextStyle(fontSize: 14, color: hexaCodeToColor(AppColors.primaryBtn)),
-          confirmBtnText: "Confirm",
+          // confirmBtnText: "Confirm",
           text: 'Swap Successfully!',
-          onConfirmBtnTap: () async {
+          // onConfirmBtnTap: () async {
             // await exolixConfirmSwap(lstTx!.length - 1);
-          },
+          // },
         );
 
         return fromJson(json.decode(value.body));

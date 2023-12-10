@@ -213,11 +213,11 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
           showCancelBtn: true,
           cancelBtnText: "Close",
           cancelBtnTextStyle: TextStyle(fontSize: 14, color: hexaCodeToColor(AppColors.primaryBtn)),
-          confirmBtnText: "Confirm",
+          // confirmBtnText: "Confirm",
           text: 'Swap Successfully!',
-          onConfirmBtnTap: () {
-            confirmSwap(lstTx.length - 1);
-          },
+          // onConfirmBtnTap: () {
+          //   confirmSwap(lstTx.length - 1);
+          // },
         );
 
         return fromJson(json.decode(value.body));

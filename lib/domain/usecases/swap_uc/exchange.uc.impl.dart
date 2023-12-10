@@ -251,9 +251,13 @@ class ExchangeUcImpl<T> {
 
       swapModel.withdrawalAddr = Provider.of<SDKProvider>(_context!, listen: false).getSdkImpl.evmAddress;
 
-      await exchanges![currentIndex.value].swap(swapModel).then( (ExChangeTxI res){
+      int? res = await exchanges![currentIndex.value].swap(swapModel, confirmSwap).then( (ExChangeTxI res){
         exchanges![currentIndex.value].tx.add( res );
       });
+
+      if (res != null){
+        confirmSwap(res);
+      }
 
       // Close Dialog
       Navigator.pop(_context!);
