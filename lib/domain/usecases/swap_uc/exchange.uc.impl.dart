@@ -243,24 +243,24 @@ class ExchangeUcImpl<T> {
 
   Future<void> swap() async {
 
-    print("swap");
-
     try {
 
       dialogLoading(_context!);
 
       swapModel.withdrawalAddr = Provider.of<SDKProvider>(_context!, listen: false).getSdkImpl.evmAddress;
 
-      int? res = await exchanges![currentIndex.value].swap(swapModel, confirmSwap).then( (ExChangeTxI res){
+      await exchanges![currentIndex.value].swap(swapModel, confirmSwap).then( (ExChangeTxI res){
         exchanges![currentIndex.value].tx.add( res );
-      });
 
-      if (res != null){
-        confirmSwap(res);
-      }
+      });
 
       // Close Dialog
       Navigator.pop(_context!);
+
+      // If Click Confirm Swap
+      if ( (exchanges![currentIndex.value].tx.last as ExChangeTxI).isConfirm == true){
+        await confirmSwap(exchanges![currentIndex.value].tx.indexOf(exchanges![currentIndex.value].tx.last));
+      }
 
     } catch (e) {
       
@@ -293,27 +293,7 @@ class ExchangeUcImpl<T> {
     );
   }
 
-  // Future<void> paySwap(int index) async {
-    
-  //   Navigator.push(
-  //     _context!,
-  //     MaterialPageRoute(builder: (context) => const PincodeScreen(title: '', label: PinCodeLabel.fromSendTx,))
-  //   ).then((value) async {
-
-  //     // _paymentUcImpl.recipientController.text = lstTx![index].depositAddress!;
-  //     // _paymentUcImpl.amountController.text = lstTx![index].amount!;
-
-  //     if (value != null){
-  //       // await _paymentUcImpl.sendBep20();
-  //     }
-
-  //   });
-
-  // }
-
   Future<void> swapping(ExChangeTxI tx, int statusIndex) async {
-    
-    print("swapping");
     
     int indexFound = Provider.of<WalletProvider>(_context!, listen: false).sortListContract!.indexWhere((model) {
       

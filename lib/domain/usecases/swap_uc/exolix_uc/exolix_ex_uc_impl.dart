@@ -32,6 +32,9 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI, 
 
   @override
   String? id, coinFrom ,coinFromNetwork ,coinFromIcon, coinFromNetworkName ,coinTo, coinToNetworkName ,coinToNetwork ,coinToIcon ,depositAddr ,depositAmt ,withdrawalAddress ,createdAt ,withdrawalAmount, status;
+  @override
+  bool? isConfirm;
+
   ExolixExchangeUCImpl.txMapping({
     required this.id,
     required this.coinFrom,
@@ -50,6 +53,7 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI, 
     required this.createdAt,
     required this.status,
     required this.withdrawalAmount,
+    required this.isConfirm,
   });
   ExChangeTxI fromJson(Map<String, dynamic> jsn){
     return ExolixExchangeUCImpl.txMapping(
@@ -73,6 +77,7 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI, 
 
       createdAt: jsn['createdAt'],
       status: jsn['status'],
+      isConfirm: false
 
     );
   }
@@ -138,7 +143,7 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI, 
   }
 
   @override
-  Future<ExChangeTxI> exolixSwap(SwapModel swapModel) async {
+  Future<ExChangeTxI> exolixSwap(SwapModel swapModel, Function confirmSwap) async {
 
     Map<String, dynamic> body = {
       "coinFrom": swapModel.from,
@@ -173,20 +178,23 @@ class ExolixExchangeUCImpl<T> implements ExolixExchangeUseCases, ExchangeCoinI, 
         
         await SecureStorageImpl().writeSecure(DbKey.lstExolicTxIds_key, json.encode(lstTx));
 
-        await QuickAlert.show(
+        bool? isConfirm = await QuickAlert.show(
           context: _context!,
           type: QuickAlertType.success,
           showCancelBtn: true,
           cancelBtnText: "Close",
           cancelBtnTextStyle: TextStyle(fontSize: 14, color: hexaCodeToColor(AppColors.primaryBtn)),
-          // confirmBtnText: "Confirm",
+          confirmBtnText: "Confirm",
           text: 'Swap Successfully!',
-          // onConfirmBtnTap: () async {
-            // await exolixConfirmSwap(lstTx!.length - 1);
-          // },
+          onConfirmBtnTap: () async {
+            print("lstTx!.length ${lstTx!.length}");
+            // await confirmSwap(lstTx!.length - 1);
+            // lstTx.
+            Navigator.pop(_context!, true);
+          },
         );
 
-        return fromJson(json.decode(value.body));
+        return fromJson(json.decode(value.body))..isConfirm = isConfirm ?? false;
         
       } else {
         throw json.decode(value.body);

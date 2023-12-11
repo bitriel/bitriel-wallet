@@ -34,5 +34,6 @@ abstract class ExChangeTxI {
   String? createdAt;
   String? status;
   String? withdrawalAmount;
+  bool? isConfirm;
   
 }

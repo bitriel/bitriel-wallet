@@ -66,6 +66,9 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
 
   @override
   String? id, coinFrom ,coinFromNetwork ,coinFromIcon, coinFromNetworkName ,coinTo, coinToNetworkName ,coinToNetwork ,coinToIcon ,depositAddr ,depositAmt ,withdrawalAddress ,createdAt ,withdrawalAmount, status;
+  @override
+  bool? isConfirm;
+  
   LetsExchangeUCImpl.txMapping({
     required this.id,
     required this.coinFrom,
@@ -84,6 +87,7 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
     required this.createdAt,
     required this.status,
     required this.withdrawalAmount,
+    required this.isConfirm,
   });
 
   ExChangeTxI fromJson(Map<String, dynamic> jsn){
@@ -109,7 +113,7 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
 
       withdrawalAddress: jsn['withdrawal'],
       createdAt: jsn['created_at'],
-
+      isConfirm: false
     );
   }
 
@@ -207,7 +211,7 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
         
         await SecureStorageImpl().writeSecure(DbKey.lstLetsExchangeTxIds, json.encode(lstTx));
 
-        await QuickAlert.show(
+        bool? isConfirm = await QuickAlert.show(
           context: _context!,
           type: QuickAlertType.success,
           showCancelBtn: true,
@@ -215,12 +219,13 @@ class LetsExchangeUCImpl<T> implements LetsExchangeUseCases, ExchangeCoinI, ExCh
           cancelBtnTextStyle: TextStyle(fontSize: 14, color: hexaCodeToColor(AppColors.primaryBtn)),
           // confirmBtnText: "Confirm",
           text: 'Swap Successfully!',
-          // onConfirmBtnTap: () {
+          onConfirmBtnTap: () {
           //   confirmSwap(lstTx.length - 1);
-          // },
+            Navigator.pop(_context!, true);
+          },
         );
 
-        return fromJson(json.decode(value.body));
+        return fromJson(json.decode(value.body))..isConfirm = isConfirm ?? false;
         
       } else {
         throw json.decode(value.body);

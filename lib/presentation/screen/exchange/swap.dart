@@ -64,83 +64,78 @@ class SwapScreen extends StatelessWidget {
           
         ],
       ),
-      body: SingleChildScrollView(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-        
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(10))
-                  ),
-                  child: Column(
-                    children: [
-        
-                      _payInput(context, _exchangeUcImpl),
-        
-                      const SizedBox(height: 10),
-        
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: IconButton(
-                          onPressed: (){
-                            
-                          },
-                          icon: Icon(Iconsax.refresh_circle, size: 35, color: hexaCodeToColor(AppColors.orangeColor),)
-                        ),
-                      ),
-                    
-                      _getDisplay(context, _exchangeUcImpl),
-        
-                    ],
-                  ),
-                ),
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+      
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(10))
               ),
-        
-              AnimatedToggle(
-                values: const ["Exolix", "Let's Exchange"],
-                onToggleCallback: _exchangeUcImpl.switchExchange,
-                buttonColor: hexaCodeToColor(AppColors.primaryBtn),
-                backgroundColor: hexaCodeToColor(AppColors.primaryBtn).withOpacity(0.2),
-                textColor: Colors.white,
+              child: Column(
+                children: [
+      
+                  _payInput(context, _exchangeUcImpl),
+      
+                  const SizedBox(height: 10),
+      
+                  // Align(
+                  //   alignment: Alignment.centerRight,
+                  //   child: IconButton(
+                  //     onPressed: (){
+                        
+                  //     },
+                  //     icon: Icon(Iconsax.refresh_circle, size: 35, color: hexaCodeToColor(AppColors.orangeColor),)
+                  //   ),
+                  // ),
+                
+                  _getDisplay(context, _exchangeUcImpl),
+      
+                ],
               ),
-        
-              Expanded(
-                child: Container()
-              ),
-        
-              Center(
-                child: _buildNumberPad(context, _exchangeUcImpl.swapModel.withdrawAmt!.value, _exchangeUcImpl.onDeleteTxt, _exchangeUcImpl.formatDouble)
-              ),
-        
-              // Swap Button
-              SafeArea(
-                child: ValueListenableBuilder(
-                  valueListenable: _exchangeUcImpl.isBtn,
-                  builder: (context, isBtn, wg) {
-              
-                    return MyButton(
-                      edgeMargin: const EdgeInsets.all(paddingSize),
-                      textButton: "Swap",
-                      buttonColor: isBtn == false ? AppColors.greyCode : AppColors.primaryBtn,
-                      action: isBtn == false ? null : 
-                      () async {
-                        await _exchangeUcImpl.swap();
-                      },
-                    );
-                  }
-                ),
-              ),
-              
-            ],
+            ),
           ),
-        ),
+      
+          AnimatedToggle(
+            values: const ["Exolix", "Let's Exchange"],
+            onToggleCallback: _exchangeUcImpl.switchExchange,
+            buttonColor: hexaCodeToColor(AppColors.primaryBtn),
+            backgroundColor: hexaCodeToColor(AppColors.primaryBtn).withOpacity(0.2),
+            textColor: Colors.white,
+          ),
+      
+          const Expanded(
+            child: SizedBox()
+          ),
+      
+          Center(
+            child: _buildNumberPad(context, _exchangeUcImpl.swapModel.withdrawAmt!.value, _exchangeUcImpl.onDeleteTxt, _exchangeUcImpl.formatDouble)
+          ),
+      
+          // Swap Button
+          SafeArea(
+            child: ValueListenableBuilder(
+              valueListenable: _exchangeUcImpl.isBtn,
+              builder: (context, isBtn, wg) {
+          
+                return MyButton(
+                  edgeMargin: const EdgeInsets.all(paddingSize),
+                  textButton: "Swap",
+                  buttonColor: isBtn == false ? AppColors.greyCode : AppColors.primaryBtn,
+                  action: isBtn == false ? null : 
+                  () async {
+                    await _exchangeUcImpl.swap();
+                  },
+                );
+              }
+            ),
+          ),
+          
+        ],
       ),
     );
   }
